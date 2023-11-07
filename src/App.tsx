@@ -34,10 +34,14 @@ function App(_Props: { toggleColorMode: void }) {
   const [sidenavTableList, setSidenavTableList] = useState<string[]>([]);
 
   const fetchSidenavTableList = async () => {
-    const url = new URL("/sidenav/tables", import.meta.env.VITE_BASE_URL);
-    const response = await fetch(url.href);
-    const tablenames = await response.json();
-    setSidenavTableList(tablenames);
+    try {
+      const url = new URL("/sidenav/tables", import.meta.env.VITE_BASE_URL);
+      const response = await fetch(url.href);
+      const tablenames = await response.json();
+      setSidenavTableList(tablenames);
+    } catch (err) {
+      console.error("URL not found", err);
+    }
   };
 
   useEffect(() => {
