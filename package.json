@@ -3,13 +3,6 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "mimeTypes": {
-    ".js": "application/javascript",
-    ".mjs": "application/javascript",
-    ".jsx": "application/javascript",
-    ".tsx": "application/javascript",
-    ".ts": "application/javascript"
-  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
