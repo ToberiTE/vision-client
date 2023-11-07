@@ -4,7 +4,6 @@
     "useDefineForClassFields": true,
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
-
     "skipLibCheck": true,
 
     /* Bundler mode */
@@ -22,13 +21,7 @@
     "noFallthroughCasesInSwitch": true,
     "types": ["vite/client"]
   },
+  "files": ["./src/main.tsx"],
   "include": ["src"],
-  "mimeTypes": {
-    ".js": "application/javascript",
-    ".mjs": "application/javascript",
-    ".jsx": "application/javascript",
-    ".tsx": "application/javascript",
-    ".ts": "application/javascript"
-  },
   "references": [{ "path": "./tsconfig.node.json" }]
 }
