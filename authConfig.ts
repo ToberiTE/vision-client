@@ -2,10 +2,10 @@ import { LogLevel } from "@azure/msal-browser";
 
 export const msalConfig = {
     auth: {
-        clientId: "fcf76067-5c14-4096-9405-c37cd6b24569",
+        clientId: import.meta.env.CLIENT_ID,
         authority:
-            "https://login.microsoftonline.com/4df8ac53-79eb-4832-b36e-0b46afc12e00",
-        redirectUri: "https://vision-client.azurewebsites.net/.auth/login/aad/callback",
+            import.meta.env.AUTHORITY,
+        redirectUri: import.meta.env.REDIRECT_URI,
     },
     cache: {
         cacheLocation: "sessionStorage",
