@@ -53,4 +53,4 @@ jobs:
           app-name: "vision-client"
           slot-name: "Production"
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_314DAEEF5BEB4A62B847B334E0D3BCB2 }}
-          package: .
+          package: ./dist
