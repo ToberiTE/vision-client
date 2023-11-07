@@ -8,12 +8,5 @@ export default defineConfig({
         port: 8080
     },
     plugins: [react()],
-
-    build: {
-        outDir: 'build',
-        rollupOptions: {
-            input: './src/main.tsx'
-        }
-    }
 })
 

@@ -18,10 +18,10 @@ jobs:
         with:
           node-version: "18.x"
 
-      - name: npm install and build
+      - name: npm install & build
         run: |
           npm install
-          npm run build --output build
+          npm run build --if-present
 
   deploy:
     runs-on: ubuntu-latest
@@ -33,7 +33,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: "Deploy to Azure Web App"
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
@@ -41,4 +40,4 @@ jobs:
           app-name: "vision-client"
           slot-name: "Production"
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_314DAEEF5BEB4A62B847B334E0D3BCB2 }}
-          package: build
+          package: .
