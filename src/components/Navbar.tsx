@@ -10,7 +10,7 @@ import {
 import { useContext } from "react";
 import { ColorModeContext } from "../color-context";
 import { Brightness4, Brightness7 } from "@mui/icons-material";
-import UserIcon from "@mui/icons-material/person";
+import UserIcon from "@mui/icons-material/Person";
 import Logout from "./Logout";
 import { useMsal } from "@azure/msal-react";
 

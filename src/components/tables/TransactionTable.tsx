@@ -44,7 +44,7 @@ type Transaction = {
 interface CreateModalProps {
   columns: MRT_ColumnDef<Transaction>[];
   onClose: () => void;
-  onSubmit: (values: Transaction) => void;
+  //   onSubmit: (values: Transaction) => void;
   open: boolean;
 }
 
@@ -52,8 +52,8 @@ export const CreateNewTransactionModal = ({
   open,
   columns,
   onClose,
-  onSubmit,
-}: CreateModalProps) => {
+}: //   onSubmit,
+CreateModalProps) => {
   const [values, setValues] = useState<any>(() =>
     columns.slice(1).reduce((acc, column) => {
       acc[column.accessorKey ?? ""] = "";
@@ -65,7 +65,7 @@ export const CreateNewTransactionModal = ({
   const handleSubmit = () => {
     // validation?
     // create
-    onSubmit(values);
+    // onSubmit(values);
     onClose();
   };
 
@@ -180,11 +180,11 @@ const TransactionTable = () => {
     [cellId: string]: string;
   }>({});
 
-  const handleCreateNewRow = (values: Transaction) => {
-    console.log("~ Unauthorized ~");
-    // tableData.push(values);
-    // setTableData([...tableData]);
-  };
+  //   const handleCreateNewRow = (values: Transaction) => {
+  //     console.log("~ Unauthorized ~");
+  //     tableData.push(values);
+  //     setTableData([...tableData]);
+  //   };
 
   const handleSaveRowEdits: MaterialReactTableProps<Transaction>["onEditingRowSave"] =
     async ({ exitEditingMode, row, values }) => {
@@ -345,7 +345,7 @@ const TransactionTable = () => {
             columns={columns}
             open={createModalOpen}
             onClose={() => setCreateModalOpen(false)}
-            onSubmit={handleCreateNewRow}
+            // onSubmit={handleCreateNewRow}
           />
         </ThemeProvider>
       </Box>

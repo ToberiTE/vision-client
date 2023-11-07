@@ -56,7 +56,7 @@ enum Status {
 interface CreateModalProps {
   columns: MRT_ColumnDef<Project>[];
   onClose: () => void;
-  onSubmit: (values: Project) => void;
+  //   onSubmit: (values: Project) => void;
   open: boolean;
 }
 
@@ -64,8 +64,8 @@ export const CreateNewProjectModal = ({
   open,
   columns,
   onClose,
-  onSubmit,
-}: CreateModalProps) => {
+}: //   onSubmit,
+CreateModalProps) => {
   const [values, setValues] = useState<any>(() =>
     columns.slice(1).reduce((acc, column) => {
       acc[column.accessorKey ?? ""] = "";
@@ -78,7 +78,7 @@ export const CreateNewProjectModal = ({
   const handleSubmit = () => {
     // validation?
     // create
-    onSubmit(values);
+    // onSubmit(values);
     onClose();
   };
 
@@ -224,11 +224,11 @@ const ProjectTable = () => {
     [cellId: string]: string;
   }>({});
 
-  const handleCreateNewRow = (values: Project) => {
-    console.log("~ Unauthorized ~");
-    // tableData.push(values);
-    // setTableData([...tableData]);
-  };
+  //   const handleCreateNewRow = (values: Project) => {
+  //     console.log("~ Unauthorized ~");
+  //     tableData.push(values);
+  //     setTableData([...tableData]);
+  //   };
 
   const handleSaveRowEdits: MaterialReactTableProps<Project>["onEditingRowSave"] =
     async ({ exitEditingMode, row, values }) => {
@@ -389,7 +389,7 @@ const ProjectTable = () => {
             columns={columns}
             open={createModalOpen}
             onClose={() => setCreateModalOpen(false)}
-            onSubmit={handleCreateNewRow}
+            // onSubmit={handleCreateNewRow}
           />
         </ThemeProvider>
       </Box>
