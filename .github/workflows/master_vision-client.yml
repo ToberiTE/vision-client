@@ -54,4 +54,4 @@ jobs:
         with:
           app-name: vision-client
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_314DAEEF5BEB4A62B847B334E0D3BCB2 }}
-          package: ./dist
+          package: .
