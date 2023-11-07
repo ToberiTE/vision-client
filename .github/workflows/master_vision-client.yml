@@ -30,7 +30,7 @@ jobs:
           npm run build
 
       - name: Archive production build
-        run: tar cvzf build.tar.gz dist --exclude=node_modules
+        run: tar cvzf build.tar.gz --exclude=node_modules dist
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
