@@ -1,4 +1,4 @@
-import ReactDOM from "react-dom/client";
+import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./App";
 import { MsalProvider } from "@azure/msal-react";
@@ -7,8 +7,10 @@ import { msalConfig } from "../authConfig";
 
 const msalInstance = new PublicClientApplication(msalConfig);
 
-ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
+const root = document.getElementById("root") as HTMLElement;
+ReactDOM.render(
   <MsalProvider instance={msalInstance}>
     <App toggleColorMode={undefined} />
-  </MsalProvider>
+  </MsalProvider>,
+  root
 );
