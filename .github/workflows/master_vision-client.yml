@@ -30,13 +30,13 @@ jobs:
           npm run build
 
       - name: Archive production build
-        run: tar cvzf build.tar.gz --exclude=node_modules dist
+        run: tar cvzf dist.tar.gz --exclude=node_modules dist
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
           name: build
-          path: build.tar.gz
+          path: dist.tar.gz
 
   deploy:
     needs: build
@@ -55,4 +55,3 @@ jobs:
           app-name: vision-client
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_314DAEEF5BEB4A62B847B334E0D3BCB2 }}
           package: ./dist
-          deploy_type: direct
