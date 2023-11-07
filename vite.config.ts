@@ -10,7 +10,7 @@ export default defineConfig({
     plugins: [react()],
 
     build: {
-        outDir: 'dist',
+        outDir: 'build',
         rollupOptions: {
             input: './src/main.tsx'
         }
