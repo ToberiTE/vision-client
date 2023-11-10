@@ -819,11 +819,14 @@ const Dashboard: React.FC = () => {
                   toggleComponentFullscreen === component.id ? "0" : "1rem",
                 padding: "1rem",
                 pb:
-                  dashboardLayout === 0 ||
-                  (dashboardLayout === 1 && selectedComponents.length === 1)
+                  toggleComponentFullscreen === component.id
+                    ? "4rem"
+                    : dashboardLayout === 0 ||
+                      (dashboardLayout === 1 && selectedComponents.length === 1)
                     ? "4rem"
                     : "1rem",
                 height:
+                  toggleComponentFullscreen === component.id ||
                   dashboardLayout === 0 ||
                   (dashboardLayout === 1 && selectedComponents.length === 1)
                     ? "100%"
@@ -832,12 +835,17 @@ const Dashboard: React.FC = () => {
                     : "100%",
 
                 minWidth:
-                  dashboardLayout === 0
+                  toggleComponentFullscreen === component.id
+                    ? "100%"
+                    : dashboardLayout === 0
                     ? "100%"
                     : dashboardLayout === 1 && selectedComponents.length >= 2
                     ? "33%"
+                    : toggleComponentFullscreen === component.id
+                    ? "100%"
                     : "100%",
                 aspectRatio:
+                  toggleComponentFullscreen === component.id ||
                   dashboardLayout === 0 ||
                   (dashboardLayout === 1 && selectedComponents.length === 1)
                     ? "100%"
