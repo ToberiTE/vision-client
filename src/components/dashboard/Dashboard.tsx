@@ -909,12 +909,11 @@ const Dashboard: React.FC = () => {
                     {["ac", "lc", "bc", "bbc", "rc", "pc"].includes(
                       component.id
                     ) && (
-                      <FormControl>
+                      <FormControl size="small">
                         <InputLabel aria-invalid id="group">
                           Group by
                         </InputLabel>
                         <Select
-                          size="small"
                           sx={{
                             minWidth: "11rem",
                           }}
