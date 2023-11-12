@@ -780,7 +780,7 @@ const Dashboard: React.FC = () => {
                 : xlScreen &&
                   dashboardLayout === 1 &&
                   selectedComponents.length >= 2
-                ? "1fr 1fr"
+                ? "1fr 1fr 1fr"
                 : lgScreen &&
                   dashboardLayout === 1 &&
                   selectedComponents.length >= 2
