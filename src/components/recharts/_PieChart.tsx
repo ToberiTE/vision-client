@@ -44,6 +44,10 @@ const _PieChart: React.FC<data> = () => {
     (state: RootState) => state.pieChartGroupBy
   );
 
+  const [data, setData] = useState(pieChartData);
+  const [hoverIndex, setHoverIndex] = useState(null);
+  const [shouldAnimate, setShouldAnimate] = useState(false);
+
   const index = pieChartData[0] ?? [];
   let date = Object.keys(index)[1];
   let val = Object.keys(index)[2];
@@ -53,7 +57,17 @@ const _PieChart: React.FC<data> = () => {
     val = Object.keys(index)[1];
   }
 
-  const [data, setData] = useState(pieChartData);
+  let dataToMap;
+  data.length > 0 ? (dataToMap = data) : pieChartData;
+
+  let legendLayout: boolean = data.length > 40 ? true : false;
+
+  const legendStyle = {
+    height: "80%",
+    overflow: "auto",
+    width: "10%",
+    marginRight: "5%",
+  };
 
   useMemo(() => {
     let arrayData = Object.values(pieChartData);
@@ -78,19 +92,6 @@ const _PieChart: React.FC<data> = () => {
     setData(arrayData);
   }, [pieChartData, pieChartSorting, pieChartFilterStart, pieChartFilterEnd]);
 
-  const [hoverIndex, setHoverIndex] = useState(null);
-
-  const handleMouseEnter = useCallback(
-    (_: any, i: any) => {
-      setHoverIndex(i + 1);
-    },
-    [setHoverIndex]
-  );
-
-  const handleMouseLeave = useCallback(() => {
-    setHoverIndex(null);
-  }, [setHoverIndex]);
-
   const cellColors = useMemo(() => {
     const shades = [];
     const hslaString = pieChartColor.match(
@@ -106,21 +107,40 @@ const _PieChart: React.FC<data> = () => {
       shades.push(shadeColor);
     }
     return shades;
-  }, [pieChartData, pieChartColor, pieChartLMin, pieChartLMax]);
+  }, [
+    pieChartData,
+    pieChartColor,
+    pieChartLMin,
+    pieChartLMax,
+    pieChartSorting,
+    pieChartFilterStart,
+    pieChartFilterEnd,
+  ]);
 
-  let dataToMap;
-  data.length > 0 ? (dataToMap = data) : pieChartData;
+  const handleMouseEnter = useCallback((_: any, i: any) => {
+    setHoverIndex(i + 1);
+    setShouldAnimate(false);
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    setHoverIndex(null);
+  }, []);
+
+  useMemo(() => {
+    setShouldAnimate(true);
+  }, [pieChartData]);
 
   return (
     <ResponsiveContainer>
       <PieChart>
         <Pie
+          blendStroke
           dataKey={val ?? []}
           data={data.length > 0 ? data : pieChartData}
           label={({ value, percent }) =>
             `${value} (${(percent * 100).toFixed(1)}%)`
           }
-          isAnimationActive={false}
+          isAnimationActive={shouldAnimate}
         >
           {dataToMap?.map((_, i) => (
             <Cell
@@ -140,15 +160,18 @@ const _PieChart: React.FC<data> = () => {
             />
           ))}
         </Pie>
-
         <Legend
+          align={legendLayout ? "right" : "center"}
+          wrapperStyle={legendLayout ? legendStyle : undefined}
           payload={dataToMap?.map((_, i) => ({
             color: cellColors[i],
             value: _[date],
           }))}
+          layout={legendLayout ? "vertical" : "horizontal"}
+          verticalAlign={legendLayout ? "middle" : "bottom"}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
-        />
+        ></Legend>
         <Tooltip
           itemStyle={{ color: "inherit" }}
           contentStyle={{

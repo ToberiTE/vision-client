@@ -896,19 +896,19 @@ const Dashboard: React.FC = () => {
                 }}
               >
                 <Typography variant="body1">
-                  {component?.id === "sc"
+                  {component.id === "sc"
                     ? scatterChartTitle
-                    : component?.id === "ac"
+                    : component.id === "ac"
                     ? areaChartTitle
-                    : component?.id === "lc"
+                    : component.id === "lc"
                     ? lineChartTitle
-                    : component?.id === "bc"
+                    : component.id === "bc"
                     ? barChartTitle
-                    : component?.id === "bbc"
+                    : component.id === "bbc"
                     ? brushBarChartTitle
-                    : component?.id === "rc"
+                    : component.id === "rc"
                     ? radarChartTitle
-                    : component?.id === "pc"
+                    : component.id === "pc"
                     ? pieChartTitle
                     : ""}
                 </Typography>
