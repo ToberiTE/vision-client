@@ -137,6 +137,7 @@ const Dashboard: React.FC = () => {
   const theme = useTheme();
   const xlScreen = useMediaQuery(theme.breakpoints.up(2000));
   const lgScreen = useMediaQuery(theme.breakpoints.up(1550));
+  const mdScreen = useMediaQuery(theme.breakpoints.up(1050));
   const dispatch = useDispatch<Dispatch<AnyAction>>();
   const { accounts } = useMsal();
   const name = accounts[0]?.idTokenClaims?.name;
@@ -779,7 +780,7 @@ const Dashboard: React.FC = () => {
                 ? "100%"
                 : xlScreen &&
                   dashboardLayout === 1 &&
-                  selectedComponents.length >= 2
+                  selectedComponents.length > 2
                 ? "1fr 1fr 1fr"
                 : lgScreen &&
                   dashboardLayout === 1 &&
@@ -839,7 +840,7 @@ const Dashboard: React.FC = () => {
                     ? "100%"
                     : dashboardLayout === 0
                     ? "100%"
-                    : dashboardLayout === 1 && selectedComponents.length >= 2
+                    : dashboardLayout === 1 && selectedComponents.length > 2
                     ? "33%"
                     : toggleComponentFullscreen === component.id
                     ? "100%"
@@ -860,41 +861,28 @@ const Dashboard: React.FC = () => {
                   toggleComponentFullscreen === component.id ? "999999" : "",
               }}
             >
+              {/* TOOLBAR CONTAINER */}
               <Box
                 sx={{
-                  display:
-                    (component.id === "sc" && scatterChartToolbarVisible) ||
-                    (component.id === "ac" && areaChartToolbarVisible) ||
-                    (component.id === "lc" && lineChartToolbarVisible) ||
-                    (component.id === "bc" && barChartToolbarVisible) ||
-                    (component.id === "bbc" && brushBarChartToolbarVisible) ||
-                    (component.id === "rc" && radarChartToolbarVisible) ||
-                    (component.id === "pc" && pieChartToolbarVisible)
-                      ? "none"
-                      : "flex",
-                  justifyContent: "end",
-                  p: "0 0 0.5rem 0.5rem",
+                  pb: "0.5rem",
+                  display: "grid",
+                  alignItems: "center",
+                  columnGap: "1rem",
+                  rowGap: "0.5rem",
+                  gridTemplateColumns:
+                    (dashboardLayout === 0 && lgScreen) ||
+                    (dashboardLayout === 1 &&
+                      lgScreen &&
+                      selectedComponents.length === 1) ||
+                    (dashboardLayout === 1 &&
+                      xlScreen &&
+                      selectedComponents.length === 2)
+                      ? "1fr auto auto"
+                      : "1fr auto auto 1fr",
                 }}
               >
-                <ToolbarShow
-                  onClick={() => handleComponentUpdate(component.id, "toolbar")}
-                />
-              </Box>
-              <FlexBetween
-                sx={{
-                  display:
-                    (component.id === "sc" && scatterChartToolbarVisible) ||
-                    (component.id === "ac" && areaChartToolbarVisible) ||
-                    (component.id === "lc" && lineChartToolbarVisible) ||
-                    (component.id === "bc" && barChartToolbarVisible) ||
-                    (component.id === "bbc" && brushBarChartToolbarVisible) ||
-                    (component.id === "rc" && radarChartToolbarVisible) ||
-                    (component.id === "pc" && pieChartToolbarVisible)
-                      ? "flex"
-                      : "none",
-                  p: "0 0 0.5rem 0.5rem",
-                }}
-              >
+                {/* GRID ROW TOP */}
+
                 <Typography variant="body1">
                   {component.id === "sc"
                     ? scatterChartTitle
@@ -912,299 +900,337 @@ const Dashboard: React.FC = () => {
                     ? pieChartTitle
                     : ""}
                 </Typography>
-                <Box display="flex">
-                  <Box pr={2}>
-                    {["ac", "lc", "bc", "bbc", "rc", "pc"].includes(
-                      component.id
-                    ) && (
-                      <FormControl size="small">
-                        <InputLabel aria-invalid id="group">
-                          Group by
-                        </InputLabel>
-                        <Select
-                          sx={{
-                            minWidth: "11rem",
-                          }}
-                          labelId="group"
-                          value={
-                            component.id === "ac"
-                              ? areaChartGroupBy
-                              : component.id === "lc"
-                              ? lineChartGroupBy
-                              : component.id === "bc"
-                              ? barChartGroupBy
-                              : component.id === "bbc"
-                              ? brushBarChartGroupBy
-                              : component.id === "rc"
-                              ? radarChartGroupBy
-                              : component.id === "pc"
-                              ? pieChartGroupBy
-                              : ""
-                          }
-                          input={<OutlinedInput label="Group by" />}
-                        >
-                          {groupByOpt.map((opt) => (
-                            <MenuItem
-                              key={opt}
-                              value={opt}
-                              onClick={() =>
-                                handleComponentUpdate(
-                                  component.id,
-                                  "group",
-                                  component.id === "ac"
-                                    ? areaChartSelectedTable
-                                    : component.id === "lc"
-                                    ? lineChartSelectedTable
-                                    : component.id === "bc"
-                                    ? barChartSelectedTable
-                                    : component.id === "bbc"
-                                    ? brushBarChartSelectedTable
-                                    : component.id === "rc"
-                                    ? radarChartSelectedTable
-                                    : component.id === "pc"
-                                    ? pieChartSelectedTable
-                                    : "",
-                                  opt
-                                )
-                              }
-                            >
-                              {opt}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
+
+                {/* ICONS BOX */}
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "end",
+                    gridColumn: 4,
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display:
+                        (component.id === "sc" && scatterChartToolbarVisible) ||
+                        (component.id === "ac" && areaChartToolbarVisible) ||
+                        (component.id === "lc" && lineChartToolbarVisible) ||
+                        (component.id === "bc" && barChartToolbarVisible) ||
+                        (component.id === "bbc" &&
+                          brushBarChartToolbarVisible) ||
+                        (component.id === "rc" && radarChartToolbarVisible) ||
+                        (component.id === "pc" && pieChartToolbarVisible)
+                          ? "flex"
+                          : "none",
+                    }}
+                  >
+                    {/* SORT ICONS */}
+                    {(component.id === "ac" && areaChartSorting) ||
+                    (component.id === "lc" && lineChartSorting) ||
+                    (component.id === "bc" && barChartSorting) ||
+                    (component.id === "bbc" && brushBarChartSorting) ||
+                    (component.id === "pc" && pieChartSorting) ? (
+                      <SortDescIcon
+                        onClick={() =>
+                          handleComponentUpdate(component.id, "sort")
+                        }
+                      />
+                    ) : (component.id === "ac" && !areaChartSorting) ||
+                      (component.id === "lc" && !lineChartSorting) ||
+                      (component.id === "bc" && !barChartSorting) ||
+                      (component.id === "bbc" && !brushBarChartSorting) ||
+                      (component.id === "pc" && !pieChartSorting) ? (
+                      <SortAscIcon
+                        onClick={() =>
+                          handleComponentUpdate(component.id, "sort")
+                        }
+                      />
+                    ) : null}
+
+                    {/* FULLSCREEN ICONS */}
+
+                    {toggleComponentFullscreen.length === 0 ? (
+                      <IconButton
+                        title="Enter fullscreen"
+                        sx={{
+                          ml: "0.5rem",
+                        }}
+                        onClick={() =>
+                          handleToggleComponentFullscreen(component.id)
+                        }
+                      >
+                        <FullscreenIcon />
+                      </IconButton>
+                    ) : (
+                      <IconButton
+                        title="Exit fullscreen"
+                        sx={{
+                          ml: "0.5rem",
+                        }}
+                        onClick={() => handleToggleComponentFullscreen("")}
+                      >
+                        <FullscreenExitIcon />
+                      </IconButton>
                     )}
+
+                    {/* SETTINGS ICON */}
+
+                    <IconButton
+                      title="Configure"
+                      sx={{
+                        mx: "0.5rem",
+                      }}
+                      onClick={() => handleOpenComponentSettings(component.id)}
+                    >
+                      <SettingsIcon />
+                    </IconButton>
                   </Box>
+
+                  {/* TOOLBAR VISIBILITY ICONS */}
+                  {(component.id === "sc" && scatterChartToolbarVisible) ||
+                  (component.id === "ac" && areaChartToolbarVisible) ||
+                  (component.id === "lc" && lineChartToolbarVisible) ||
+                  (component.id === "bc" && barChartToolbarVisible) ||
+                  (component.id === "bbc" && brushBarChartToolbarVisible) ||
+                  (component.id === "rc" && radarChartToolbarVisible) ||
+                  (component.id === "pc" && pieChartToolbarVisible) ? (
+                    <ToolbarHide
+                      onClick={() =>
+                        handleComponentUpdate(component.id, "toolbar")
+                      }
+                    />
+                  ) : (
+                    <ToolbarShow
+                      onClick={() =>
+                        handleComponentUpdate(component.id, "toolbar")
+                      }
+                    />
+                  )}
+                </Box>
+
+                {/* GRID ROW BOTTOM */}
+                <Box
+                  sx={{
+                    justifyContent: "end",
+                    gridRow:
+                      (dashboardLayout === 0 && lgScreen) ||
+                      (dashboardLayout === 1 &&
+                        lgScreen &&
+                        selectedComponents.length === 1) ||
+                      (dashboardLayout === 1 &&
+                        xlScreen &&
+                        selectedComponents.length === 2)
+                        ? "1"
+                        : "2",
+                    gridColumn:
+                      (dashboardLayout === 0 && lgScreen) ||
+                      (dashboardLayout === 1 &&
+                        lgScreen &&
+                        selectedComponents.length === 1) ||
+                      (dashboardLayout === 1 &&
+                        xlScreen &&
+                        selectedComponents.length === 2)
+                        ? "3"
+                        : "1 / span 4",
+                    gap: "1rem",
+                    display:
+                      (component.id === "sc" && scatterChartToolbarVisible) ||
+                      (component.id === "ac" && areaChartToolbarVisible) ||
+                      (component.id === "lc" && lineChartToolbarVisible) ||
+                      (component.id === "bc" && barChartToolbarVisible) ||
+                      (component.id === "bbc" && brushBarChartToolbarVisible) ||
+                      (component.id === "rc" && radarChartToolbarVisible) ||
+                      (component.id === "pc" && pieChartToolbarVisible)
+                        ? "flex"
+                        : "none",
+                  }}
+                >
+                  {["ac", "lc", "bc", "bbc", "rc", "pc"].includes(
+                    component.id
+                  ) && (
+                    <FormControl
+                      size="small"
+                      sx={{
+                        minWidth: "11rem",
+                      }}
+                    >
+                      <InputLabel aria-invalid id="group">
+                        Group by
+                      </InputLabel>
+                      <Select
+                        labelId="group"
+                        value={
+                          component.id === "ac"
+                            ? areaChartGroupBy
+                            : component.id === "lc"
+                            ? lineChartGroupBy
+                            : component.id === "bc"
+                            ? barChartGroupBy
+                            : component.id === "bbc"
+                            ? brushBarChartGroupBy
+                            : component.id === "rc"
+                            ? radarChartGroupBy
+                            : component.id === "pc"
+                            ? pieChartGroupBy
+                            : ""
+                        }
+                        input={<OutlinedInput label="Group by" />}
+                      >
+                        {groupByOpt.map((opt) => (
+                          <MenuItem
+                            key={opt}
+                            value={opt}
+                            onClick={() =>
+                              handleComponentUpdate(
+                                component.id,
+                                "group",
+                                component.id === "ac"
+                                  ? areaChartSelectedTable
+                                  : component.id === "lc"
+                                  ? lineChartSelectedTable
+                                  : component.id === "bc"
+                                  ? barChartSelectedTable
+                                  : component.id === "bbc"
+                                  ? brushBarChartSelectedTable
+                                  : component.id === "rc"
+                                  ? radarChartSelectedTable
+                                  : component.id === "pc"
+                                  ? pieChartSelectedTable
+                                  : "",
+                                opt
+                              )
+                            }
+                          >
+                            {opt}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  )}
                   {["ac", "lc", "bc", "bbc", "pc"].includes(component.id) && (
                     <>
-                      <Box display="flex" gap={2} pr={2}>
-                        <DatePicker
-                          label="Start date"
-                          slotProps={{
-                            textField: { size: "small", error: false },
-                          }}
-                          disableHighlightToday
-                          views={["year", "month", "day"]}
-                          value={
-                            component.id === "ac"
-                              ? dayjs(areaChartFilterStart)
-                              : component.id === "lc"
-                              ? dayjs(lineChartFilterStart)
-                              : component.id === "bc"
-                              ? dayjs(barChartFilterStart)
-                              : component.id === "bbc"
-                              ? dayjs(brushBarChartFilterStart)
-                              : component.id === "pc"
-                              ? dayjs(pieChartFilterStart)
-                              : undefined
-                          }
-                          minDate={
-                            component.id === "ac"
-                              ? dayjs(areaChartMinDate)
-                              : component.id === "lc"
-                              ? dayjs(lineChartMinDate)
-                              : component.id === "bc"
-                              ? dayjs(barChartMinDate)
-                              : component.id === "bbc"
-                              ? dayjs(brushBarChartMinDate)
-                              : component.id === "pc"
-                              ? dayjs(pieChartMinDate)
-                              : ""
-                          }
-                          maxDate={
-                            component.id === "ac"
-                              ? dayjs(areaChartMaxDate)
-                              : component.id === "lc"
-                              ? dayjs(lineChartMaxDate)
-                              : component.id === "bc"
-                              ? dayjs(barChartMaxDate)
-                              : component.id === "bbc"
-                              ? dayjs(brushBarChartMaxDate)
-                              : component.id === "pc"
-                              ? dayjs(pieChartMaxDate)
-                              : ""
-                          }
-                          sx={{
-                            maxWidth: "11rem",
-                          }}
-                          onChange={(startDate) =>
-                            handleComponentUpdate(
-                              component.id,
-                              "filter",
-                              String(startDate) ?? undefined
-                            )
-                          }
-                        ></DatePicker>
-                        <DatePicker
-                          label="End date"
-                          slotProps={{
-                            textField: { size: "small", error: false },
-                          }}
-                          disableHighlightToday
-                          views={["year", "month", "day"]}
-                          value={
-                            component.id === "ac"
-                              ? dayjs(areaChartFilterEnd)
-                              : component.id === "lc"
-                              ? dayjs(lineChartFilterEnd)
-                              : component.id === "bc"
-                              ? dayjs(barChartFilterEnd)
-                              : component.id === "bbc"
-                              ? dayjs(brushBarChartFilterEnd)
-                              : component.id === "pc"
-                              ? dayjs(pieChartFilterEnd)
-                              : ""
-                          }
-                          minDate={
-                            component.id === "ac"
-                              ? dayjs(areaChartMinDate)
-                              : component.id === "lc"
-                              ? dayjs(lineChartMinDate)
-                              : component.id === "bc"
-                              ? dayjs(barChartMinDate)
-                              : component.id === "bbc"
-                              ? dayjs(brushBarChartMinDate)
-                              : component.id === "pc"
-                              ? dayjs(pieChartMinDate)
-                              : ""
-                          }
-                          maxDate={
-                            component.id === "ac"
-                              ? dayjs(areaChartMaxDate)
-                              : component.id === "lc"
-                              ? dayjs(lineChartMaxDate)
-                              : component.id === "bc"
-                              ? dayjs(barChartMaxDate)
-                              : component.id === "bbc"
-                              ? dayjs(brushBarChartMaxDate)
-                              : component.id === "pcc"
-                              ? dayjs(pieChartMaxDate)
-                              : ""
-                          }
-                          sx={{
-                            maxWidth: "11rem",
-                          }}
-                          onChange={(endDate) =>
-                            handleComponentUpdate(
-                              component.id,
-                              "filter",
-                              undefined,
-                              String(endDate) ?? undefined
-                            )
-                          }
-                        ></DatePicker>
-                      </Box>
-                      {component.id === "ac" && areaChartSorting && (
-                        <SortDescIcon
-                          onClick={() =>
-                            handleComponentUpdate(component.id, "sort")
-                          }
-                        />
-                      )}
-                      {component.id === "ac" && !areaChartSorting && (
-                        <SortAscIcon
-                          onClick={() =>
-                            handleComponentUpdate(component.id, "sort")
-                          }
-                        />
-                      )}
-                      {component.id === "lc" && lineChartSorting && (
-                        <SortDescIcon
-                          onClick={() =>
-                            handleComponentUpdate(component.id, "sort")
-                          }
-                        />
-                      )}
-                      {component.id === "lc" && !lineChartSorting && (
-                        <SortAscIcon
-                          onClick={() =>
-                            handleComponentUpdate(component.id, "sort")
-                          }
-                        />
-                      )}
-                      {component.id === "bc" && barChartSorting && (
-                        <SortDescIcon
-                          onClick={() =>
-                            handleComponentUpdate(component.id, "sort")
-                          }
-                        />
-                      )}
-                      {component.id === "bc" && !barChartSorting && (
-                        <SortAscIcon
-                          onClick={() =>
-                            handleComponentUpdate(component.id, "sort")
-                          }
-                        />
-                      )}
-                      {component.id === "bbc" && brushBarChartSorting && (
-                        <SortDescIcon
-                          onClick={() =>
-                            handleComponentUpdate(component.id, "sort")
-                          }
-                        />
-                      )}
-                      {component.id === "bbc" && !brushBarChartSorting && (
-                        <SortAscIcon
-                          onClick={() =>
-                            handleComponentUpdate(component.id, "sort")
-                          }
-                        />
-                      )}
-                      {component.id === "pc" && pieChartSorting && (
-                        <SortDescIcon
-                          onClick={() =>
-                            handleComponentUpdate(component.id, "sort")
-                          }
-                        />
-                      )}
-                      {component.id === "pc" && !pieChartSorting && (
-                        <SortAscIcon
-                          onClick={() =>
-                            handleComponentUpdate(component.id, "sort")
-                          }
-                        />
-                      )}
+                      <DatePicker
+                        label="Start date"
+                        slotProps={{
+                          textField: { size: "small", error: false },
+                        }}
+                        disableHighlightToday
+                        views={["year", "month", "day"]}
+                        value={
+                          component.id === "ac"
+                            ? dayjs(areaChartFilterStart)
+                            : component.id === "lc"
+                            ? dayjs(lineChartFilterStart)
+                            : component.id === "bc"
+                            ? dayjs(barChartFilterStart)
+                            : component.id === "bbc"
+                            ? dayjs(brushBarChartFilterStart)
+                            : component.id === "pc"
+                            ? dayjs(pieChartFilterStart)
+                            : undefined
+                        }
+                        minDate={
+                          component.id === "ac"
+                            ? dayjs(areaChartMinDate)
+                            : component.id === "lc"
+                            ? dayjs(lineChartMinDate)
+                            : component.id === "bc"
+                            ? dayjs(barChartMinDate)
+                            : component.id === "bbc"
+                            ? dayjs(brushBarChartMinDate)
+                            : component.id === "pc"
+                            ? dayjs(pieChartMinDate)
+                            : ""
+                        }
+                        maxDate={
+                          component.id === "ac"
+                            ? dayjs(areaChartMaxDate)
+                            : component.id === "lc"
+                            ? dayjs(lineChartMaxDate)
+                            : component.id === "bc"
+                            ? dayjs(barChartMaxDate)
+                            : component.id === "bbc"
+                            ? dayjs(brushBarChartMaxDate)
+                            : component.id === "pc"
+                            ? dayjs(pieChartMaxDate)
+                            : ""
+                        }
+                        sx={{
+                          maxWidth: "11rem",
+                        }}
+                        onChange={(startDate) =>
+                          handleComponentUpdate(
+                            component.id,
+                            "filter",
+                            String(startDate) ?? undefined
+                          )
+                        }
+                      ></DatePicker>
+                      <DatePicker
+                        label="End date"
+                        slotProps={{
+                          textField: { size: "small", error: false },
+                        }}
+                        disableHighlightToday
+                        views={["year", "month", "day"]}
+                        value={
+                          component.id === "ac"
+                            ? dayjs(areaChartFilterEnd)
+                            : component.id === "lc"
+                            ? dayjs(lineChartFilterEnd)
+                            : component.id === "bc"
+                            ? dayjs(barChartFilterEnd)
+                            : component.id === "bbc"
+                            ? dayjs(brushBarChartFilterEnd)
+                            : component.id === "pc"
+                            ? dayjs(pieChartFilterEnd)
+                            : ""
+                        }
+                        minDate={
+                          component.id === "ac"
+                            ? dayjs(areaChartMinDate)
+                            : component.id === "lc"
+                            ? dayjs(lineChartMinDate)
+                            : component.id === "bc"
+                            ? dayjs(barChartMinDate)
+                            : component.id === "bbc"
+                            ? dayjs(brushBarChartMinDate)
+                            : component.id === "pc"
+                            ? dayjs(pieChartMinDate)
+                            : ""
+                        }
+                        maxDate={
+                          component.id === "ac"
+                            ? dayjs(areaChartMaxDate)
+                            : component.id === "lc"
+                            ? dayjs(lineChartMaxDate)
+                            : component.id === "bc"
+                            ? dayjs(barChartMaxDate)
+                            : component.id === "bbc"
+                            ? dayjs(brushBarChartMaxDate)
+                            : component.id === "pcc"
+                            ? dayjs(pieChartMaxDate)
+                            : ""
+                        }
+                        sx={{
+                          maxWidth: "11rem",
+                        }}
+                        onChange={(endDate) =>
+                          handleComponentUpdate(
+                            component.id,
+                            "filter",
+                            undefined,
+                            String(endDate) ?? undefined
+                          )
+                        }
+                      ></DatePicker>
                     </>
                   )}
-                  {toggleComponentFullscreen.length === 0 ? (
-                    <IconButton
-                      title="Toggle fullscreen"
-                      sx={{
-                        ml: "0.5rem",
-                      }}
-                      onClick={() =>
-                        handleToggleComponentFullscreen(component.id)
-                      }
-                    >
-                      <FullscreenIcon />
-                    </IconButton>
-                  ) : (
-                    <IconButton
-                      title="Exit fullscreen"
-                      sx={{
-                        ml: "0.5rem",
-                      }}
-                      onClick={() => handleToggleComponentFullscreen("")}
-                    >
-                      <FullscreenExitIcon />
-                    </IconButton>
-                  )}
-                  <IconButton
-                    title="Configure"
-                    sx={{
-                      mx: "0.5rem",
-                    }}
-                    onClick={() => handleOpenComponentSettings(component.id)}
-                  >
-                    <SettingsIcon />
-                  </IconButton>
-                  <ToolbarHide
-                    onClick={() =>
-                      handleComponentUpdate(component.id, "toolbar")
-                    }
-                  />
                 </Box>
-              </FlexBetween>
+              </Box>
+
+              {/* TOOLBAR END */}
+
               {openComponentSettings === component.id && (
                 <Dialog open={true}>
                   <Box sx={{ minWidth: "22.5rem" }}>
