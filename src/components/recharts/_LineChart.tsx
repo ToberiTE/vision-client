@@ -12,17 +12,19 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { useTheme } from "@mui/material";
 import { useMemo, useState } from "react";
+import React from "react";
 
 interface data {
   [key: string]: any[];
 }
 
-const _LineChart: React.FC<data> = () => {
+const _LineChart: React.FC<data> = React.memo(() => {
   const theme = useTheme();
-
   const { lineChartData } = useSelector(
     (state: RootState) => state.lineChartData
   );
+  const [data, setData] = useState(lineChartData);
+
   const { lineChartColorX } = useSelector(
     (state: RootState) => state.lineChartColorX
   );
@@ -75,8 +77,6 @@ const _LineChart: React.FC<data> = () => {
       [dataKey]: 0.8,
     });
   };
-
-  const [data, setData] = useState(lineChartData);
 
   useMemo(() => {
     let arrayData = Object.values(lineChartData);
@@ -135,6 +135,6 @@ const _LineChart: React.FC<data> = () => {
       </LineChart>
     </ResponsiveContainer>
   );
-};
+});
 
 export default _LineChart;

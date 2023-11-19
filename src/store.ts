@@ -13,6 +13,7 @@ const store = configureStore({
         dashboardLayout: dashboardReducer,
         selectedComponentIds: dashboardReducer,
         componentTables: dashboardReducer,
+        componentWillAnimate: dashboardReducer,
         areaChartData: _areaChartReducer,
         barChartData: _barChartReducer,
         brushBarChartData: _brushBarChartReducer,
@@ -76,7 +77,7 @@ const store = configureStore({
         radarChartToolbarVisible: _radarChartReducer,
         pieChartToolbarVisible: _pieChartReducer,
     },
-    devTools: true,
+    devTools: false,
 });
 
 export type RootState = ReturnType<typeof store.getState>;

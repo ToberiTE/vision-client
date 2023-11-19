@@ -12,12 +12,13 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { useTheme } from "@mui/material";
 import { useMemo, useState } from "react";
+import React from "react";
 
 interface data {
   [key: string]: any[];
 }
 
-const _BarChart: React.FC<data> = () => {
+const _BarChart: React.FC<data> = React.memo(() => {
   const theme = useTheme();
 
   const { barChartData } = useSelector(
@@ -41,6 +42,8 @@ const _BarChart: React.FC<data> = () => {
   const { barChartGroupBy } = useSelector(
     (state: RootState) => state.barChartGroupBy
   );
+
+  const [data, setData] = useState(barChartData);
 
   const index = barChartData[0] ?? [];
   let date = Object.keys(index)[1];
@@ -75,8 +78,6 @@ const _BarChart: React.FC<data> = () => {
       [dataKey]: 0.8,
     });
   };
-
-  const [data, setData] = useState(barChartData);
 
   useMemo(() => {
     let arrayData = Object.values(barChartData);
@@ -116,11 +117,10 @@ const _BarChart: React.FC<data> = () => {
           onMouseLeave={handleMouseLeave}
         />
         <Bar dataKey={x} fill={barChartColorX} fillOpacity={opacity[y]} />
-
         <Bar dataKey={y} fill={barChartColorY} fillOpacity={opacity[x]} />
       </BarChart>
     </ResponsiveContainer>
   );
-};
+});
 
 export default _BarChart;

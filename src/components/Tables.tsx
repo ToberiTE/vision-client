@@ -1,8 +1,9 @@
 import { Box, useTheme } from "@mui/material";
 import TransactionReactQueryProvider from "./tables/TransactionTable";
 import ProjectTable from "./tables/ProjectTable";
+import React from "react";
 
-const Tables: React.FC = () => {
+const Tables: React.FC = React.memo(() => {
   const theme = useTheme();
 
   return (
@@ -20,6 +21,6 @@ const Tables: React.FC = () => {
       </Box>
     </Box>
   );
-};
+});
 
 export default Tables;

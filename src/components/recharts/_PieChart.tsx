@@ -16,9 +16,8 @@ interface data {
   [key: string]: any[];
 }
 
-const _PieChart: React.FC<data> = () => {
+const _PieChart: React.FC<data> = React.memo(() => {
   const theme = useTheme();
-
   const { pieChartData } = useSelector(
     (state: RootState) => state.pieChartData
   );
@@ -43,10 +42,14 @@ const _PieChart: React.FC<data> = () => {
   const { pieChartGroupBy } = useSelector(
     (state: RootState) => state.pieChartGroupBy
   );
+  const { dashboardLayout } = useSelector(
+    (state: RootState) => state.dashboardLayout
+  );
 
   const [data, setData] = useState(pieChartData);
-  const [hoverIndex, setHoverIndex] = useState(null);
-  const [shouldAnimate, setShouldAnimate] = useState(false);
+
+  const [hoverIndex, setHoverIndex] = useState<any>(null);
+  const [shouldAnimate, setShouldAnimate] = useState<boolean>(false);
 
   const index = pieChartData[0] ?? [];
   let date = Object.keys(index)[1];
@@ -65,8 +68,8 @@ const _PieChart: React.FC<data> = () => {
   const legendStyle = {
     height: "80%",
     overflow: "auto",
-    width: "10%",
-    marginRight: "5%",
+    width: dashboardLayout === 0 ? "10%" : "fit-content",
+    marginRight: dashboardLayout === 0 ? "5%" : 0,
   };
 
   useMemo(() => {
@@ -134,13 +137,13 @@ const _PieChart: React.FC<data> = () => {
     <ResponsiveContainer>
       <PieChart>
         <Pie
+          isAnimationActive={shouldAnimate}
           blendStroke
           dataKey={val ?? []}
           data={data.length > 0 ? data : pieChartData}
           label={({ value, percent }) =>
             `${value} (${(percent * 100).toFixed(1)}%)`
           }
-          isAnimationActive={shouldAnimate}
         >
           {dataToMap?.map((_, i) => (
             <Cell
@@ -181,6 +184,6 @@ const _PieChart: React.FC<data> = () => {
       </PieChart>
     </ResponsiveContainer>
   );
-};
+});
 
 export default _PieChart;

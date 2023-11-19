@@ -11,22 +11,21 @@ import {
 import { RootState } from "../../store";
 import { useSelector } from "react-redux";
 import { useTheme } from "@mui/material";
+import React from "react";
 
 interface data {
   [key: string]: any[];
 }
 
-const _ScatterChart: React.FC<data> = () => {
+const _ScatterChart: React.FC<data> = React.memo(() => {
   const theme = useTheme();
 
   const { scatterChartData } = useSelector(
     (state: RootState) => state.scatterChartData
   );
-
   const { scatterChartSelectedTable } = useSelector(
     (state: RootState) => state.scatterChartSelectedTable
   );
-
   const { scatterChartColor } = useSelector(
     (state: RootState) => state.scatterChartColor
   );
@@ -34,6 +33,7 @@ const _ScatterChart: React.FC<data> = () => {
   const index = scatterChartData[0] ?? [];
   const x = Object.keys(index)[2];
   const y = Object.keys(index)[3];
+
   return (
     <ResponsiveContainer>
       <ScatterChart>
@@ -56,6 +56,6 @@ const _ScatterChart: React.FC<data> = () => {
       </ScatterChart>
     </ResponsiveContainer>
   );
-};
+});
 
 export default _ScatterChart;

@@ -15,12 +15,13 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { useTheme } from "@mui/material";
 import { useMemo, useState } from "react";
+import React from "react";
 
 interface data {
   [key: string]: any[];
 }
 
-const _BrushBarChart: React.FC<data> = () => {
+const _BrushBarChart: React.FC<data> = React.memo(() => {
   const theme = useTheme();
 
   const { brushBarChartData } = useSelector(
@@ -44,6 +45,8 @@ const _BrushBarChart: React.FC<data> = () => {
   const { brushBarChartGroupBy } = useSelector(
     (state: RootState) => state.brushBarChartGroupBy
   );
+
+  const [data, setData] = useState(brushBarChartData);
 
   const index = brushBarChartData[0] ?? [];
   let date = Object.keys(index)[1];
@@ -78,8 +81,6 @@ const _BrushBarChart: React.FC<data> = () => {
       [dataKey]: 0.8,
     });
   };
-
-  const [data, setData] = useState(brushBarChartData);
 
   useMemo(() => {
     let arrayData = Object.values(brushBarChartData);
@@ -133,6 +134,6 @@ const _BrushBarChart: React.FC<data> = () => {
       </BarChart>
     </ResponsiveContainer>
   );
-};
+});
 
 export default _BrushBarChart;

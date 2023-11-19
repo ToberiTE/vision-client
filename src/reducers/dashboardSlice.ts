@@ -5,14 +5,14 @@ export interface DashboardState
     dashboardLayout: number;
     selectedComponentIds: string[];
     componentTables: string[];
-
+    componentWillAnimate: boolean;
 }
 
 const initialState: DashboardState = {
     dashboardLayout: 0,
     selectedComponentIds: [],
     componentTables: [],
-
+    componentWillAnimate: true,
 };
 
 export const dashboardSlice = createSlice({
@@ -31,10 +31,14 @@ export const dashboardSlice = createSlice({
         {
             state.componentTables = action.payload;
         },
+        setComponentWillAnimate: (state, action: PayloadAction<boolean>) =>
+        {
+            state.componentWillAnimate = action.payload;
+        },
 
     },
 });
 
-export const { setDashboardLayout, setSelectedComponentIds, setComponentTables } = dashboardSlice.actions;
+export const { setDashboardLayout, setSelectedComponentIds, setComponentTables, setComponentWillAnimate } = dashboardSlice.actions;
 
 export default dashboardSlice.reducer;

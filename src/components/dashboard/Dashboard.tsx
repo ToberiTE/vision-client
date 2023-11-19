@@ -121,7 +121,6 @@ import dayjs from "dayjs";
 import { AnyAction, Dispatch } from "@reduxjs/toolkit";
 import React from "react";
 import {
-  components,
   sortDescIcon,
   sortAscIcon,
   colorPicker,
@@ -129,10 +128,11 @@ import {
   ToolbarHide,
   ToolbarShow,
   groupByOpt,
+  components,
 } from "../dashboard/DashboardComponents";
 //#endregion
 
-const Dashboard: React.FC = () => {
+const Dashboard: React.FC = React.memo(() => {
   //#region hooks
   const theme = useTheme();
   const xlScreen = useMediaQuery(theme.breakpoints.up(2000));
@@ -1629,6 +1629,6 @@ const Dashboard: React.FC = () => {
       )}
     </Box>
   );
-};
+});
 
 export default Dashboard;

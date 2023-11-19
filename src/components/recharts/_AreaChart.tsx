@@ -12,11 +12,12 @@ import { RootState } from "../../store";
 import { useSelector } from "react-redux";
 import { useTheme } from "@mui/material";
 import { useMemo, useState } from "react";
+import React from "react";
 interface data {
   [key: string]: any[];
 }
 
-const _AreaChart: React.FC<data> = () => {
+const _AreaChart: React.FC<data> = React.memo(() => {
   const theme = useTheme();
 
   const { areaChartData } = useSelector(
@@ -40,6 +41,8 @@ const _AreaChart: React.FC<data> = () => {
   const { areaChartGroupBy } = useSelector(
     (state: RootState) => state.areaChartGroupBy
   );
+
+  const [data, setData] = useState(areaChartData);
 
   const index = areaChartData[0] ?? [];
   let date = Object.keys(index)[1];
@@ -72,8 +75,6 @@ const _AreaChart: React.FC<data> = () => {
       [dataKey]: 0.8,
     });
   };
-
-  const [data, setData] = useState(areaChartData);
 
   useMemo(() => {
     let arrayData = Object.values(areaChartData);
@@ -139,6 +140,6 @@ const _AreaChart: React.FC<data> = () => {
       </AreaChart>
     </ResponsiveContainer>
   );
-};
+});
 
 export default _AreaChart;

@@ -9,12 +9,13 @@ import {
 } from "recharts";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
+import React from "react";
 
 interface data {
   [key: string]: any[];
 }
 
-const _RadarChart: React.FC<data> = () => {
+const _RadarChart: React.FC<data> = React.memo(() => {
   const { radarChartData } = useSelector(
     (state: RootState) => state.radarChartData
   );
@@ -46,6 +47,6 @@ const _RadarChart: React.FC<data> = () => {
       </RadarChart>
     </ResponsiveContainer>
   );
-};
+});
 
 export default _RadarChart;
