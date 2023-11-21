@@ -1,4 +1,3 @@
-//#region imports
 import {
   Box,
   Checkbox,
@@ -121,16 +120,15 @@ import dayjs from "dayjs";
 import { AnyAction, Dispatch } from "@reduxjs/toolkit";
 import React from "react";
 import {
-  sortDescIcon,
-  sortAscIcon,
-  colorPicker,
+  SortDescIcon,
+  SortAscIcon,
+  ColorPicker,
   FlexBetween,
-  ToolbarHide,
-  ToolbarShow,
+  ControlsHide,
+  ControlsShow,
   groupByOpt,
   components,
 } from "../dashboard/DashboardComponents";
-//#endregion
 
 const Dashboard: React.FC = React.memo(() => {
   //#region hooks
@@ -150,199 +148,117 @@ const Dashboard: React.FC = React.memo(() => {
     fetchComponentTables();
   }, []);
 
-  const SortDescIcon = useMemo(() => sortDescIcon, []);
-  const SortAscIcon = useMemo(() => sortAscIcon, []);
-  const ColorPicker = useMemo(() => colorPicker, []);
+  const rootSelector = useSelector((state: RootState) => state);
 
-  const { dashboardLayout } = useSelector(
-    (state: RootState) => state.dashboardLayout
+  const memoizedRootSelector = useMemo(
+    () => rootSelector,
+    [
+      rootSelector.dashboardReducer,
+      rootSelector._areaChartReducer,
+      rootSelector._lineChartReducer,
+      rootSelector._barChartReducer,
+      rootSelector._brushBarChartReducer,
+      rootSelector._radarChartReducer,
+      rootSelector._pieChartReducer,
+      rootSelector._scatterChartReducer,
+    ]
   );
-  const { selectedComponentIds } = useSelector(
-    (state: RootState) => state.selectedComponentIds
-  );
-  const { componentTables } = useSelector(
-    (state: RootState) => state.componentTables
-  );
-  const { scatterChartSelectedTable } = useSelector(
-    (state: RootState) => state.scatterChartSelectedTable
-  );
-  const { areaChartSelectedTable } = useSelector(
-    (state: RootState) => state.areaChartSelectedTable
-  );
-  const { lineChartSelectedTable } = useSelector(
-    (state: RootState) => state.lineChartSelectedTable
-  );
-  const { barChartSelectedTable } = useSelector(
-    (state: RootState) => state.barChartSelectedTable
-  );
-  const { brushBarChartSelectedTable } = useSelector(
-    (state: RootState) => state.brushBarChartSelectedTable
-  );
-  const { radarChartSelectedTable } = useSelector(
-    (state: RootState) => state.radarChartSelectedTable
-  );
-  const { pieChartSelectedTable } = useSelector(
-    (state: RootState) => state.pieChartSelectedTable
-  );
-  const { scatterChartTitle } = useSelector(
-    (state: RootState) => state.scatterChartTitle
-  );
-  const { areaChartTitle } = useSelector(
-    (state: RootState) => state.areaChartTitle
-  );
-  const { lineChartTitle } = useSelector(
-    (state: RootState) => state.lineChartTitle
-  );
-  const { barChartTitle } = useSelector(
-    (state: RootState) => state.barChartTitle
-  );
-  const { brushBarChartTitle } = useSelector(
-    (state: RootState) => state.brushBarChartTitle
-  );
-  const { radarChartTitle } = useSelector(
-    (state: RootState) => state.radarChartTitle
-  );
-  const { pieChartTitle } = useSelector(
-    (state: RootState) => state.pieChartTitle
-  );
-  const { scatterChartColor } = useSelector(
-    (state: RootState) => state.scatterChartColor
-  );
-  const { areaChartColorX } = useSelector(
-    (state: RootState) => state.areaChartColorX
-  );
-  const { areaChartColorY } = useSelector(
-    (state: RootState) => state.areaChartColorY
-  );
-  const { lineChartColorX } = useSelector(
-    (state: RootState) => state.lineChartColorX
-  );
-  const { lineChartColorY } = useSelector(
-    (state: RootState) => state.lineChartColorY
-  );
-  const { barChartColorX } = useSelector(
-    (state: RootState) => state.barChartColorX
-  );
-  const { barChartColorY } = useSelector(
-    (state: RootState) => state.barChartColorY
-  );
-  const { brushBarChartColorX } = useSelector(
-    (state: RootState) => state.brushBarChartColorX
-  );
-  const { brushBarChartColorY } = useSelector(
-    (state: RootState) => state.brushBarChartColorY
-  );
-  const { radarChartColor } = useSelector(
-    (state: RootState) => state.radarChartColor
-  );
-  const { pieChartColor } = useSelector(
-    (state: RootState) => state.pieChartColor
-  );
-  const { pieChartLMin } = useSelector(
-    (state: RootState) => state.pieChartLMin
-  );
-  const { pieChartLMax } = useSelector(
-    (state: RootState) => state.pieChartLMax
-  );
-  const { areaChartSorting } = useSelector(
-    (state: RootState) => state.areaChartSorting
-  );
-  const { lineChartSorting } = useSelector(
-    (state: RootState) => state.lineChartSorting
-  );
-  const { barChartSorting } = useSelector(
-    (state: RootState) => state.barChartSorting
-  );
-  const { brushBarChartSorting } = useSelector(
-    (state: RootState) => state.brushBarChartSorting
-  );
-  const { pieChartSorting } = useSelector(
-    (state: RootState) => state.pieChartSorting
-  );
-  const { areaChartData } = useSelector(
-    (state: RootState) => state.areaChartData
-  );
-  const { lineChartData } = useSelector(
-    (state: RootState) => state.lineChartData
-  );
-  const { barChartData } = useSelector(
-    (state: RootState) => state.barChartData
-  );
-  const { brushBarChartData } = useSelector(
-    (state: RootState) => state.brushBarChartData
-  );
-  const { pieChartData } = useSelector(
-    (state: RootState) => state.pieChartData
-  );
-  const { areaChartFilterStart } = useSelector(
-    (state: RootState) => state.areaChartFilterStart
-  );
-  const { areaChartFilterEnd } = useSelector(
-    (state: RootState) => state.areaChartFilterEnd
-  );
-  const { lineChartFilterStart } = useSelector(
-    (state: RootState) => state.lineChartFilterStart
-  );
-  const { lineChartFilterEnd } = useSelector(
-    (state: RootState) => state.lineChartFilterEnd
-  );
-  const { barChartFilterStart } = useSelector(
-    (state: RootState) => state.barChartFilterStart
-  );
-  const { barChartFilterEnd } = useSelector(
-    (state: RootState) => state.barChartFilterEnd
-  );
-  const { brushBarChartFilterStart } = useSelector(
-    (state: RootState) => state.brushBarChartFilterStart
-  );
-  const { brushBarChartFilterEnd } = useSelector(
-    (state: RootState) => state.brushBarChartFilterEnd
-  );
-  const { pieChartFilterStart } = useSelector(
-    (state: RootState) => state.pieChartFilterStart
-  );
-  const { pieChartFilterEnd } = useSelector(
-    (state: RootState) => state.pieChartFilterEnd
-  );
-  const { scatterChartToolbarVisible } = useSelector(
-    (state: RootState) => state.scatterChartToolbarVisible
-  );
-  const { areaChartToolbarVisible } = useSelector(
-    (state: RootState) => state.areaChartToolbarVisible
-  );
-  const { lineChartToolbarVisible } = useSelector(
-    (state: RootState) => state.lineChartToolbarVisible
-  );
-  const { barChartToolbarVisible } = useSelector(
-    (state: RootState) => state.barChartToolbarVisible
-  );
-  const { brushBarChartToolbarVisible } = useSelector(
-    (state: RootState) => state.brushBarChartToolbarVisible
-  );
-  const { radarChartToolbarVisible } = useSelector(
-    (state: RootState) => state.radarChartToolbarVisible
-  );
-  const { pieChartToolbarVisible } = useSelector(
-    (state: RootState) => state.pieChartToolbarVisible
-  );
-  const { areaChartGroupBy } = useSelector(
-    (state: RootState) => state.areaChartGroupBy
-  );
-  const { lineChartGroupBy } = useSelector(
-    (state: RootState) => state.lineChartGroupBy
-  );
-  const { barChartGroupBy } = useSelector(
-    (state: RootState) => state.barChartGroupBy
-  );
-  const { brushBarChartGroupBy } = useSelector(
-    (state: RootState) => state.brushBarChartGroupBy
-  );
-  const { radarChartGroupBy } = useSelector(
-    (state: RootState) => state.radarChartGroupBy
-  );
-  const { pieChartGroupBy } = useSelector(
-    (state: RootState) => state.pieChartGroupBy
-  );
+
+  const {
+    dashboardReducer,
+    _areaChartReducer,
+    _lineChartReducer,
+    _barChartReducer,
+    _brushBarChartReducer,
+    _radarChartReducer,
+    _pieChartReducer,
+    _scatterChartReducer,
+  } = memoizedRootSelector;
+
+  const { dashboardLayout, selectedComponentIds, componentTables } =
+    dashboardReducer;
+
+  const {
+    areaChartSelectedTable,
+    areaChartTitle,
+    areaChartColorX,
+    areaChartColorY,
+    areaChartSorting,
+    areaChartData,
+    areaChartFilterStart,
+    areaChartFilterEnd,
+    areaChartGroupBy,
+    areaChartToolbarVisible,
+  } = _areaChartReducer;
+
+  const {
+    lineChartSelectedTable,
+    lineChartTitle,
+    lineChartColorX,
+    lineChartColorY,
+    lineChartSorting,
+    lineChartData,
+    lineChartFilterStart,
+    lineChartFilterEnd,
+    lineChartToolbarVisible,
+    lineChartGroupBy,
+  } = _lineChartReducer;
+
+  const {
+    barChartSelectedTable,
+    barChartTitle,
+    barChartColorX,
+    barChartColorY,
+    barChartSorting,
+    barChartData,
+    barChartFilterStart,
+    barChartFilterEnd,
+    barChartGroupBy,
+    barChartToolbarVisible,
+  } = _barChartReducer;
+
+  const {
+    brushBarChartSelectedTable,
+    brushBarChartTitle,
+    brushBarChartColorX,
+    brushBarChartColorY,
+    brushBarChartSorting,
+    brushBarChartData,
+    brushBarChartFilterStart,
+    brushBarChartFilterEnd,
+    brushBarChartToolbarVisible,
+    brushBarChartGroupBy,
+  } = _brushBarChartReducer;
+
+  const {
+    radarChartSelectedTable,
+    radarChartTitle,
+    radarChartColor,
+    radarChartToolbarVisible,
+    radarChartGroupBy,
+  } = _radarChartReducer;
+
+  const {
+    pieChartSelectedTable,
+    pieChartTitle,
+    pieChartColor,
+    pieChartLMin,
+    pieChartLMax,
+    pieChartSorting,
+    pieChartData,
+    pieChartFilterStart,
+    pieChartFilterEnd,
+    pieChartToolbarVisible,
+    pieChartGroupBy,
+  } = _pieChartReducer;
+
+  const {
+    scatterChartSelectedTable,
+    scatterChartTitle,
+    scatterChartColor,
+    scatterChartToolbarVisible,
+  } = _scatterChartReducer;
+
   const areaChartDates = Object.values(areaChartData).map((p) =>
     dayjs(p.date).valueOf()
   );
@@ -973,7 +889,6 @@ const Dashboard: React.FC = React.memo(() => {
                     )}
 
                     {/* SETTINGS ICON */}
-
                     <IconButton
                       title="Configure"
                       sx={{
@@ -993,13 +908,13 @@ const Dashboard: React.FC = React.memo(() => {
                   (component.id === "bbc" && brushBarChartToolbarVisible) ||
                   (component.id === "rc" && radarChartToolbarVisible) ||
                   (component.id === "pc" && pieChartToolbarVisible) ? (
-                    <ToolbarHide
+                    <ControlsHide
                       onClick={() =>
                         handleComponentUpdate(component.id, "toolbar")
                       }
                     />
                   ) : (
-                    <ToolbarShow
+                    <ControlsShow
                       onClick={() =>
                         handleComponentUpdate(component.id, "toolbar")
                       }
@@ -1228,8 +1143,7 @@ const Dashboard: React.FC = React.memo(() => {
                 </Box>
               </Box>
 
-              {/* TOOLBAR END */}
-
+              {/* CONTROLS END */}
               {openComponentSettings === component.id && (
                 <Dialog open={true}>
                   <Box sx={{ minWidth: "22.5rem" }}>

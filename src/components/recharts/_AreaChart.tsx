@@ -20,27 +20,30 @@ interface data {
 const _AreaChart: React.FC<data> = React.memo(() => {
   const theme = useTheme();
 
-  const { areaChartData } = useSelector(
-    (state: RootState) => state.areaChartData
+  const selector = useSelector((state: RootState) => state._areaChartReducer);
+
+  const memoizedSelector = useMemo(
+    () => selector,
+    [
+      selector.areaChartData,
+      selector.areaChartColorX,
+      selector.areaChartColorY,
+      selector.areaChartSorting,
+      selector.areaChartFilterStart,
+      selector.areaChartFilterEnd,
+      selector.areaChartGroupBy,
+    ]
   );
-  const { areaChartColorX } = useSelector(
-    (state: RootState) => state.areaChartColorX
-  );
-  const { areaChartColorY } = useSelector(
-    (state: RootState) => state.areaChartColorY
-  );
-  const { areaChartSorting } = useSelector(
-    (state: RootState) => state.areaChartSorting
-  );
-  const { areaChartFilterStart } = useSelector(
-    (state: RootState) => state.areaChartFilterStart
-  );
-  const { areaChartFilterEnd } = useSelector(
-    (state: RootState) => state.areaChartFilterStart
-  );
-  const { areaChartGroupBy } = useSelector(
-    (state: RootState) => state.areaChartGroupBy
-  );
+
+  const {
+    areaChartData,
+    areaChartColorX,
+    areaChartColorY,
+    areaChartSorting,
+    areaChartFilterStart,
+    areaChartFilterEnd,
+    areaChartGroupBy,
+  } = memoizedSelector;
 
   const [data, setData] = useState(areaChartData);
 
@@ -60,10 +63,14 @@ const _AreaChart: React.FC<data> = React.memo(() => {
     y: 0,
   });
 
+  const memoizedOpacity = useMemo(() => {
+    return opacity;
+  }, [opacity]);
+
   const handleMouseEnter = (o: any) => {
     const { dataKey } = o;
     setOpacity({
-      ...opacity,
+      ...memoizedOpacity,
       [dataKey]: 0,
     });
   };
@@ -71,7 +78,7 @@ const _AreaChart: React.FC<data> = React.memo(() => {
   const handleMouseLeave = (o: any) => {
     const { dataKey } = o;
     setOpacity({
-      ...opacity,
+      ...memoizedOpacity,
       [dataKey]: 0.8,
     });
   };
@@ -122,7 +129,7 @@ const _AreaChart: React.FC<data> = React.memo(() => {
           stroke={areaChartColorX}
           strokeOpacity={0}
           fill={areaChartColorX}
-          fillOpacity={opacity[y]}
+          fillOpacity={memoizedOpacity[y]}
         />
         <Area
           name={y}
@@ -131,7 +138,7 @@ const _AreaChart: React.FC<data> = React.memo(() => {
           stroke={areaChartColorY}
           strokeOpacity={0}
           fill={areaChartColorY}
-          fillOpacity={opacity[x]}
+          fillOpacity={memoizedOpacity[x]}
         />
         <Legend
           onMouseEnter={handleMouseEnter}

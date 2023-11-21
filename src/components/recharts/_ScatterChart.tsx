@@ -11,7 +11,7 @@ import {
 import { RootState } from "../../store";
 import { useSelector } from "react-redux";
 import { useTheme } from "@mui/material";
-import React from "react";
+import React, { useMemo } from "react";
 
 interface data {
   [key: string]: any[];
@@ -20,15 +20,25 @@ interface data {
 const _ScatterChart: React.FC<data> = React.memo(() => {
   const theme = useTheme();
 
-  const { scatterChartData } = useSelector(
-    (state: RootState) => state.scatterChartData
+  const { componentWillAnimate } = useSelector(
+    (state: RootState) => state.dashboardReducer
   );
-  const { scatterChartSelectedTable } = useSelector(
-    (state: RootState) => state.scatterChartSelectedTable
+
+  const selector = useSelector(
+    (state: RootState) => state._scatterChartReducer
   );
-  const { scatterChartColor } = useSelector(
-    (state: RootState) => state.scatterChartColor
+
+  const memoizedSelector = useMemo(
+    () => selector,
+    [
+      selector.scatterChartData,
+      selector.scatterChartSelectedTable,
+      selector.scatterChartColor,
+    ]
   );
+
+  const { scatterChartData, scatterChartSelectedTable, scatterChartColor } =
+    memoizedSelector;
 
   const index = scatterChartData[0] ?? [];
   const x = Object.keys(index)[2];
@@ -49,6 +59,7 @@ const _ScatterChart: React.FC<data> = React.memo(() => {
         />
         <Legend />
         <Scatter
+          isAnimationActive={componentWillAnimate}
           name={scatterChartSelectedTable.slice(8)}
           data={scatterChartData}
           fill={scatterChartColor}

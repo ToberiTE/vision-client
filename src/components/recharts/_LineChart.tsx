@@ -7,12 +7,14 @@ import {
   ResponsiveContainer,
   CartesianGrid,
   Legend,
+  Brush,
 } from "recharts";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { useTheme } from "@mui/material";
 import { useMemo, useState } from "react";
 import React from "react";
+import { customLabel } from "./utils";
 
 interface data {
   [key: string]: any[];
@@ -20,29 +22,33 @@ interface data {
 
 const _LineChart: React.FC<data> = React.memo(() => {
   const theme = useTheme();
-  const { lineChartData } = useSelector(
-    (state: RootState) => state.lineChartData
-  );
-  const [data, setData] = useState(lineChartData);
 
-  const { lineChartColorX } = useSelector(
-    (state: RootState) => state.lineChartColorX
+  const selector = useSelector((state: RootState) => state._lineChartReducer);
+
+  const memoizedSelector = useMemo(
+    () => selector,
+    [
+      selector.lineChartData,
+      selector.lineChartColorX,
+      selector.lineChartColorY,
+      selector.lineChartSorting,
+      selector.lineChartFilterStart,
+      selector.lineChartFilterEnd,
+      selector.lineChartGroupBy,
+    ]
   );
-  const { lineChartColorY } = useSelector(
-    (state: RootState) => state.lineChartColorY
-  );
-  const { lineChartSorting } = useSelector(
-    (state: RootState) => state.lineChartSorting
-  );
-  const { lineChartFilterStart } = useSelector(
-    (state: RootState) => state.lineChartFilterStart
-  );
-  const { lineChartFilterEnd } = useSelector(
-    (state: RootState) => state.lineChartFilterEnd
-  );
-  const { lineChartGroupBy } = useSelector(
-    (state: RootState) => state.lineChartGroupBy
-  );
+
+  const {
+    lineChartData,
+    lineChartColorX,
+    lineChartColorY,
+    lineChartSorting,
+    lineChartFilterStart,
+    lineChartFilterEnd,
+    lineChartGroupBy,
+  } = memoizedSelector;
+
+  const [data, setData] = useState(lineChartData);
 
   const index = lineChartData[0] ?? [];
   let date = Object.keys(index)[1];
@@ -60,11 +66,15 @@ const _LineChart: React.FC<data> = React.memo(() => {
     y: 0,
   });
 
+  const memoizedOpacity = useMemo(() => {
+    return opacity;
+  }, [opacity]);
+
   const handleMouseEnter = (o: any) => {
     const { dataKey } = o;
 
     setOpacity({
-      ...opacity,
+      ...memoizedOpacity,
       [dataKey]: 0,
     });
   };
@@ -73,10 +83,12 @@ const _LineChart: React.FC<data> = React.memo(() => {
     const { dataKey } = o;
 
     setOpacity({
-      ...opacity,
+      ...memoizedOpacity,
       [dataKey]: 0.8,
     });
   };
+
+  const CustomLabel = useMemo(() => customLabel, []);
 
   useMemo(() => {
     let arrayData = Object.values(lineChartData);
@@ -104,33 +116,57 @@ const _LineChart: React.FC<data> = React.memo(() => {
     lineChartFilterStart,
     lineChartFilterEnd,
   ]);
-
   return (
     <ResponsiveContainer>
       <LineChart data={data.length ? data : lineChartData}>
-        <Line
-          type="monotone"
-          dataKey={x}
-          stroke={lineChartColorX}
-          strokeOpacity={opacity[y]}
-        />
-        <Line
-          type="monotone"
-          dataKey={y}
-          stroke={lineChartColorY}
-          strokeOpacity={opacity[x]}
-        />
         <CartesianGrid vertical={false} />
         <XAxis dataKey={date} />
         <YAxis />
+        <Line
+          type="monotone"
+          dot={false}
+          dataKey={x}
+          stroke={lineChartColorX}
+          strokeOpacity={memoizedOpacity[y]}
+          label={
+            <CustomLabel
+              x={x}
+              y={y}
+              textAnchor="middle"
+              writingMode=""
+              value={x}
+              fill={lineChartColorX}
+              opacity={memoizedOpacity[y]}
+            />
+          }
+        />
+        <Line
+          type="monotone"
+          dot={false}
+          dataKey={y}
+          stroke={lineChartColorY}
+          strokeOpacity={memoizedOpacity[x]}
+          label={
+            <CustomLabel
+              x={x}
+              y={y}
+              textAnchor="middle"
+              writingMode=""
+              value={y}
+              fill={lineChartColorY}
+              opacity={memoizedOpacity[x]}
+            />
+          }
+        />
+        <Brush dataKey={date} stroke={theme.palette.primary.main} height={20} />
+        <Legend
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        />
         <Tooltip
           contentStyle={{
             backgroundColor: theme.palette.background.paper,
           }}
-        />
-        <Legend
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
         />
       </LineChart>
     </ResponsiveContainer>

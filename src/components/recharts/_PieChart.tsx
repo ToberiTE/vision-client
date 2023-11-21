@@ -18,36 +18,39 @@ interface data {
 
 const _PieChart: React.FC<data> = React.memo(() => {
   const theme = useTheme();
-  const { pieChartData } = useSelector(
-    (state: RootState) => state.pieChartData
-  );
-  const { pieChartColor } = useSelector(
-    (state: RootState) => state.pieChartColor
-  );
-  const { pieChartLMin } = useSelector(
-    (state: RootState) => state.pieChartLMin
-  );
-  const { pieChartLMax } = useSelector(
-    (state: RootState) => state.pieChartLMax
-  );
-  const { pieChartSorting } = useSelector(
-    (state: RootState) => state.pieChartSorting
-  );
-  const { pieChartFilterStart } = useSelector(
-    (state: RootState) => state.pieChartFilterStart
-  );
-  const { pieChartFilterEnd } = useSelector(
-    (state: RootState) => state.pieChartFilterEnd
-  );
-  const { pieChartGroupBy } = useSelector(
-    (state: RootState) => state.pieChartGroupBy
-  );
+
   const { dashboardLayout } = useSelector(
-    (state: RootState) => state.dashboardLayout
+    (state: RootState) => state.dashboardReducer
   );
+
+  const selector = useSelector((state: RootState) => state._pieChartReducer);
+
+  const memoizedSelector = useMemo(
+    () => selector,
+    [
+      selector.pieChartData,
+      selector.pieChartColor,
+      selector.pieChartLMin,
+      selector.pieChartLMax,
+      selector.pieChartSorting,
+      selector.pieChartFilterStart,
+      selector.pieChartFilterEnd,
+      selector.pieChartGroupBy,
+    ]
+  );
+
+  const {
+    pieChartData,
+    pieChartColor,
+    pieChartLMin,
+    pieChartLMax,
+    pieChartSorting,
+    pieChartFilterStart,
+    pieChartFilterEnd,
+    pieChartGroupBy,
+  } = memoizedSelector;
 
   const [data, setData] = useState(pieChartData);
-
   const [hoverIndex, setHoverIndex] = useState<any>(null);
   const [shouldAnimate, setShouldAnimate] = useState<boolean>(false);
 

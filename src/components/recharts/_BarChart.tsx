@@ -21,27 +21,30 @@ interface data {
 const _BarChart: React.FC<data> = React.memo(() => {
   const theme = useTheme();
 
-  const { barChartData } = useSelector(
-    (state: RootState) => state.barChartData
+  const selector = useSelector((state: RootState) => state._barChartReducer);
+
+  const memoizedSelector = useMemo(
+    () => selector,
+    [
+      selector.barChartData,
+      selector.barChartColorX,
+      selector.barChartColorY,
+      selector.barChartSorting,
+      selector.barChartFilterStart,
+      selector.barChartFilterEnd,
+      selector.barChartGroupBy,
+    ]
   );
-  const { barChartColorX } = useSelector(
-    (state: RootState) => state.barChartColorX
-  );
-  const { barChartColorY } = useSelector(
-    (state: RootState) => state.barChartColorY
-  );
-  const { barChartSorting } = useSelector(
-    (state: RootState) => state.barChartSorting
-  );
-  const { barChartFilterStart } = useSelector(
-    (state: RootState) => state.barChartFilterStart
-  );
-  const { barChartFilterEnd } = useSelector(
-    (state: RootState) => state.barChartFilterStart
-  );
-  const { barChartGroupBy } = useSelector(
-    (state: RootState) => state.barChartGroupBy
-  );
+
+  const {
+    barChartData,
+    barChartColorX,
+    barChartColorY,
+    barChartSorting,
+    barChartFilterStart,
+    barChartFilterEnd,
+    barChartGroupBy,
+  } = memoizedSelector;
 
   const [data, setData] = useState(barChartData);
 
@@ -61,11 +64,15 @@ const _BarChart: React.FC<data> = React.memo(() => {
     y: 0,
   });
 
+  const memoizedOpacity = useMemo(() => {
+    return opacity;
+  }, [opacity]);
+
   const handleMouseEnter = (o: any) => {
     const { dataKey } = o;
 
     setOpacity({
-      ...opacity,
+      ...memoizedOpacity,
       [dataKey]: 0,
     });
   };
@@ -74,7 +81,7 @@ const _BarChart: React.FC<data> = React.memo(() => {
     const { dataKey } = o;
 
     setOpacity({
-      ...opacity,
+      ...memoizedOpacity,
       [dataKey]: 0.8,
     });
   };
@@ -116,8 +123,16 @@ const _BarChart: React.FC<data> = React.memo(() => {
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         />
-        <Bar dataKey={x} fill={barChartColorX} fillOpacity={opacity[y]} />
-        <Bar dataKey={y} fill={barChartColorY} fillOpacity={opacity[x]} />
+        <Bar
+          dataKey={x}
+          fill={barChartColorX}
+          fillOpacity={memoizedOpacity[y]}
+        />
+        <Bar
+          dataKey={y}
+          fill={barChartColorY}
+          fillOpacity={memoizedOpacity[x]}
+        />
       </BarChart>
     </ResponsiveContainer>
   );

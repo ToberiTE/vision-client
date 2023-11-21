@@ -9,22 +9,26 @@ import {
 } from "recharts";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
-import React from "react";
+import React, { useMemo } from "react";
 
 interface data {
   [key: string]: any[];
 }
 
 const _RadarChart: React.FC<data> = React.memo(() => {
-  const { radarChartData } = useSelector(
-    (state: RootState) => state.radarChartData
+  const selector = useSelector((state: RootState) => state._radarChartReducer);
+
+  const memoizedSelector = useMemo(
+    () => selector,
+    [
+      selector.radarChartData,
+      selector.radarChartSelectedTable,
+      selector.radarChartColor,
+    ]
   );
-  const { radarChartSelectedTable } = useSelector(
-    (state: RootState) => state.radarChartSelectedTable
-  );
-  const { radarChartColor } = useSelector(
-    (state: RootState) => state.radarChartColor
-  );
+
+  const { radarChartData, radarChartSelectedTable, radarChartColor } =
+    memoizedSelector;
 
   const index = radarChartData[0] ?? [];
   const label = Object.keys(index)[0];

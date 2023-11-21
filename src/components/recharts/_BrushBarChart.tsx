@@ -16,6 +16,7 @@ import { RootState } from "../../store";
 import { useTheme } from "@mui/material";
 import { useMemo, useState } from "react";
 import React from "react";
+import { customLabel } from "./utils";
 
 interface data {
   [key: string]: any[];
@@ -24,27 +25,32 @@ interface data {
 const _BrushBarChart: React.FC<data> = React.memo(() => {
   const theme = useTheme();
 
-  const { brushBarChartData } = useSelector(
-    (state: RootState) => state.brushBarChartData
+  const selector = useSelector(
+    (state: RootState) => state._brushBarChartReducer
   );
-  const { brushBarChartColorX } = useSelector(
-    (state: RootState) => state.brushBarChartColorX
+
+  const memoizedSelector = useMemo(
+    () => selector,
+    [
+      selector.brushBarChartData,
+      selector.brushBarChartColorX,
+      selector.brushBarChartColorY,
+      selector.brushBarChartSorting,
+      selector.brushBarChartFilterStart,
+      selector.brushBarChartFilterEnd,
+      selector.brushBarChartGroupBy,
+    ]
   );
-  const { brushBarChartColorY } = useSelector(
-    (state: RootState) => state.brushBarChartColorY
-  );
-  const { brushBarChartSorting } = useSelector(
-    (state: RootState) => state.brushBarChartSorting
-  );
-  const { brushBarChartFilterStart } = useSelector(
-    (state: RootState) => state.brushBarChartFilterStart
-  );
-  const { brushBarChartFilterEnd } = useSelector(
-    (state: RootState) => state.brushBarChartFilterEnd
-  );
-  const { brushBarChartGroupBy } = useSelector(
-    (state: RootState) => state.brushBarChartGroupBy
-  );
+
+  const {
+    brushBarChartData,
+    brushBarChartColorX,
+    brushBarChartColorY,
+    brushBarChartSorting,
+    brushBarChartFilterStart,
+    brushBarChartFilterEnd,
+    brushBarChartGroupBy,
+  } = memoizedSelector;
 
   const [data, setData] = useState(brushBarChartData);
 
@@ -64,11 +70,15 @@ const _BrushBarChart: React.FC<data> = React.memo(() => {
     y: 0,
   });
 
+  const memoizedOpacity = useMemo(() => {
+    return opacity;
+  }, [opacity]);
+
   const handleMouseEnter = (o: any) => {
     const { dataKey } = o;
 
     setOpacity({
-      ...opacity,
+      ...memoizedOpacity,
       [dataKey]: 0,
     });
   };
@@ -77,10 +87,12 @@ const _BrushBarChart: React.FC<data> = React.memo(() => {
     const { dataKey } = o;
 
     setOpacity({
-      ...opacity,
+      ...memoizedOpacity,
       [dataKey]: 0.8,
     });
   };
+
+  const CustomLabel = useMemo(() => customLabel, []);
 
   useMemo(() => {
     let arrayData = Object.values(brushBarChartData);
@@ -121,16 +133,44 @@ const _BrushBarChart: React.FC<data> = React.memo(() => {
             backgroundColor: theme.palette.background.paper,
           }}
         />
+        <ReferenceLine y={0} stroke={theme.palette.primary.main} />
+        <Bar
+          dataKey={x}
+          fill={brushBarChartColorX}
+          fillOpacity={memoizedOpacity[y]}
+          label={
+            <CustomLabel
+              textAnchor="middle"
+              value={x}
+              x={x}
+              y={y}
+              fill={theme.palette.text.primary}
+              opacity={memoizedOpacity[y]}
+              writingMode={data.length > 20 ? "vertical-rl" : "horizontal"}
+            />
+          }
+        />
+        <Bar
+          dataKey={y}
+          fill={brushBarChartColorY}
+          fillOpacity={memoizedOpacity[x]}
+          label={
+            <CustomLabel
+              textAnchor="middle"
+              value={y}
+              x={x}
+              y={y}
+              fill={theme.palette.text.primary}
+              opacity={memoizedOpacity[x]}
+              writingMode={data.length > 20 ? "vertical-rl" : "horizontal"}
+            />
+          }
+        />
+        <Brush dataKey={date} height={20} stroke={theme.palette.primary.main} />
         <Legend
-          verticalAlign="top"
-          wrapperStyle={{ lineHeight: "40px" }}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         />
-        <ReferenceLine y={0} stroke={theme.palette.primary.main} />
-        <Brush dataKey={date} height={30} stroke={theme.palette.primary.main} />
-        <Bar dataKey={x} fill={brushBarChartColorX} fillOpacity={opacity[y]} />
-        <Bar dataKey={y} fill={brushBarChartColorY} fillOpacity={opacity[x]} />
       </BarChart>
     </ResponsiveContainer>
   );

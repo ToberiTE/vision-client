@@ -45,7 +45,7 @@ interface FlexBetweenProps {
   children: JSX.Element[];
 }
 
-interface ToolbarIconProps {
+interface ControlsIconProps {
   onClick: () => void;
 }
 
@@ -87,7 +87,7 @@ const components: Component[] = [
   },
 ];
 
-const sortDescIcon = ({ onClick }: SortIconProps) => {
+const SortDescIcon = React.memo(({ onClick }: SortIconProps) => {
   return (
     <IconButton
       title={"Sort by date: Descending"}
@@ -99,9 +99,9 @@ const sortDescIcon = ({ onClick }: SortIconProps) => {
       <SortIcon />
     </IconButton>
   );
-};
+});
 
-const sortAscIcon = ({ onClick }: SortIconProps) => {
+const SortAscIcon = React.memo(({ onClick }: SortIconProps) => {
   return (
     <IconButton
       title={"Sort by date: Ascending"}
@@ -113,54 +113,51 @@ const sortAscIcon = ({ onClick }: SortIconProps) => {
       <SortIcon />
     </IconButton>
   );
-};
+});
 
-const colorPicker = ({
-  color,
-  onChange,
-  label,
-  labelId,
-}: ColorPickerProps): JSX.Element => {
-  return (
-    <FormControl>
-      <InputLabel aria-invalid id={labelId}>
-        {label}
-      </InputLabel>
-      <Select
-        value={color ?? ""}
-        renderValue={() => (
-          <Box
-            display="flex"
-            alignItems="center"
-            gap={2}
-            justifyContent="space-between"
-          >
-            <Typography sx={{ font: "inherit" }}>{color}</Typography>
+const ColorPicker = React.memo(
+  ({ color, onChange, label, labelId }: ColorPickerProps): JSX.Element => {
+    return (
+      <FormControl>
+        <InputLabel aria-invalid id={labelId}>
+          {label}
+        </InputLabel>
+        <Select
+          value={color ?? ""}
+          renderValue={() => (
             <Box
-              sx={{
-                backgroundColor: color,
-                width: "25%",
-                height: "2rem",
-                borderRadius: "0.2rem",
-                mr: "0.5rem",
-              }}
-            ></Box>
+              display="flex"
+              alignItems="center"
+              gap={2}
+              justifyContent="space-between"
+            >
+              <Typography sx={{ font: "inherit" }}>{color}</Typography>
+              <Box
+                sx={{
+                  backgroundColor: color,
+                  width: "25%",
+                  height: "2rem",
+                  borderRadius: "0.2rem",
+                  mr: "0.5rem",
+                }}
+              ></Box>
+            </Box>
+          )}
+          labelId={labelId}
+          input={<OutlinedInput label={label} />}
+        >
+          <MenuItem value={color} sx={{ display: "none" }} />
+          <Box>
+            <HslaStringColorPicker
+              color={color}
+              onChange={debounce(onChange, 200)}
+            />
           </Box>
-        )}
-        labelId={labelId}
-        input={<OutlinedInput label={label} />}
-      >
-        <MenuItem value={color} sx={{ display: "none" }} />
-        <Box>
-          <HslaStringColorPicker
-            color={color}
-            onChange={debounce(onChange, 200)}
-          />
-        </Box>
-      </Select>
-    </FormControl>
-  );
-};
+        </Select>
+      </FormControl>
+    );
+  }
+);
 
 const FlexBetween = React.memo(({ sx, children }: FlexBetweenProps) => {
   return (
@@ -175,18 +172,18 @@ const FlexBetween = React.memo(({ sx, children }: FlexBetweenProps) => {
   );
 });
 
-const ToolbarHide = React.memo(({ onClick }: ToolbarIconProps) => {
+const ControlsHide = React.memo(({ onClick }: ControlsIconProps) => {
   return (
-    <IconButton title={"Hide toolbar"} onClick={onClick}>
+    <IconButton title={"Hide controls"} onClick={onClick}>
       <VisibilityOffIcon />
     </IconButton>
   );
 });
 
-const ToolbarShow = React.memo(({ onClick }: ToolbarIconProps) => {
+const ControlsShow = React.memo(({ onClick }: ControlsIconProps) => {
   return (
-    <IconButton title={"Show toolbar"} onClick={onClick}>
-      <VisibilityIcon />
+    <IconButton title={"Show controls"} onClick={onClick}>
+      <VisibilityIcon style={{ opacity: "0.25" }} />
     </IconButton>
   );
 });
@@ -195,11 +192,11 @@ const groupByOpt: string[] = ["None", "Year", "Quarter", "Month", "Week"];
 
 export {
   components,
-  sortDescIcon,
-  sortAscIcon,
-  colorPicker,
+  SortDescIcon,
+  SortAscIcon,
+  ColorPicker,
   FlexBetween,
-  ToolbarHide,
-  ToolbarShow,
+  ControlsHide,
+  ControlsShow,
   groupByOpt,
 };
