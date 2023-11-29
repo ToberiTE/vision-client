@@ -5,14 +5,14 @@ export interface DashboardState
     dashboardLayout: number;
     selectedComponentIds: string[];
     componentTables: string[];
-    componentWillAnimate: boolean;
+    toggleComponentFullscreen: string;
 }
 
 const initialState: DashboardState = {
     dashboardLayout: 0,
     selectedComponentIds: [],
     componentTables: [],
-    componentWillAnimate: true,
+    toggleComponentFullscreen: "",
 };
 
 export const dashboardSlice = createSlice({
@@ -31,14 +31,13 @@ export const dashboardSlice = createSlice({
         {
             state.componentTables = action.payload;
         },
-        setComponentWillAnimate: (state, action: PayloadAction<boolean>) =>
+        setToggleComponentFullscreen: (state, action: PayloadAction<string>) =>
         {
-            state.componentWillAnimate = action.payload;
+            state.toggleComponentFullscreen = action.payload;
         },
-
     },
 });
 
-export const { setDashboardLayout, setSelectedComponentIds, setComponentTables, setComponentWillAnimate } = dashboardSlice.actions;
+export const { setDashboardLayout, setSelectedComponentIds, setComponentTables, setToggleComponentFullscreen } = dashboardSlice.actions;
 
 export default dashboardSlice.reducer;

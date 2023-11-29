@@ -7,12 +7,14 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  Brush,
 } from "recharts";
 import { useSelector } from "react-redux";
-import { RootState } from "../../store";
 import { useTheme } from "@mui/material";
 import { useMemo, useState } from "react";
+import { CustomLabel, sortChartData } from "./utils";
 import React from "react";
+import { selectBarChartFields } from "../../reducers/selectors";
 
 interface data {
   [key: string]: any[];
@@ -21,30 +23,14 @@ interface data {
 const _BarChart: React.FC<data> = React.memo(() => {
   const theme = useTheme();
 
-  const selector = useSelector((state: RootState) => state._barChartReducer);
-
-  const memoizedSelector = useMemo(
-    () => selector,
-    [
-      selector.barChartData,
-      selector.barChartColorX,
-      selector.barChartColorY,
-      selector.barChartSorting,
-      selector.barChartFilterStart,
-      selector.barChartFilterEnd,
-      selector.barChartGroupBy,
-    ]
-  );
-
   const {
     barChartData,
     barChartColorX,
     barChartColorY,
     barChartSorting,
-    barChartFilterStart,
-    barChartFilterEnd,
     barChartGroupBy,
-  } = memoizedSelector;
+    barChartDisplayValues,
+  } = useSelector(selectBarChartFields);
 
   const [data, setData] = useState(barChartData);
 
@@ -86,27 +72,24 @@ const _BarChart: React.FC<data> = React.memo(() => {
     });
   };
 
+  let showLabelX: boolean = true;
+  let showLabelY: boolean = true;
+  const hsla = /hsla\([^,]+,\s*[0-9]+%?\s*,\s*[0-9]+%?\s*,\s*0\)/;
+  if (hsla.test(barChartColorX)) {
+    showLabelY = false;
+  }
+  if (hsla.test(barChartColorY)) {
+    showLabelX = false;
+  }
+
   useMemo(() => {
-    let arrayData = Object.values(barChartData);
-
-    if (barChartFilterStart || barChartFilterEnd) {
-      arrayData = arrayData.filter((entry) => {
-        if (barChartFilterStart && entry.date < barChartFilterStart)
-          return false;
-        if (barChartFilterEnd && entry.date > barChartFilterEnd) return false;
-        return true;
-      });
-    }
-    arrayData.sort((a, b) => {
-      if (barChartSorting) {
-        return a.date > b.date ? 1 : a.date < b.date ? -1 : 0;
-      } else {
-        return b.date > a.date ? 1 : b.date < a.date ? -1 : 0;
-      }
-    });
-
-    setData(arrayData);
-  }, [barChartData, barChartSorting, barChartFilterStart, barChartFilterEnd]);
+    let sortedData = sortChartData(
+      barChartData,
+      barChartSorting,
+      barChartGroupBy
+    );
+    setData(sortedData);
+  }, [barChartData, barChartSorting, barChartGroupBy]);
 
   return (
     <ResponsiveContainer>
@@ -127,11 +110,44 @@ const _BarChart: React.FC<data> = React.memo(() => {
           dataKey={x}
           fill={barChartColorX}
           fillOpacity={memoizedOpacity[y]}
+          label={
+            showLabelY &&
+            barChartDisplayValues && (
+              <CustomLabel
+                textAnchor="middle"
+                value={y}
+                x={x}
+                y={y}
+                fill={theme.palette.text.primary}
+                opacity={memoizedOpacity[y]}
+                writingMode={data.length > 20 ? "vertical-rl" : "horizontal"}
+              />
+            )
+          }
         />
         <Bar
           dataKey={y}
           fill={barChartColorY}
           fillOpacity={memoizedOpacity[x]}
+          label={
+            showLabelX &&
+            barChartDisplayValues && (
+              <CustomLabel
+                textAnchor="middle"
+                value={y}
+                x={x}
+                y={y}
+                fill={theme.palette.text.primary}
+                opacity={memoizedOpacity[x]}
+                writingMode={data.length > 20 ? "vertical-rl" : "horizontal"}
+              />
+            )
+          }
+        />
+        <Brush
+          dataKey={date}
+          fill={theme.palette.background.default}
+          height={15}
         />
       </BarChart>
     </ResponsiveContainer>

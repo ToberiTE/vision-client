@@ -8,9 +8,8 @@ interface BarChartState
     barChartColorX: string,
     barChartColorY: string,
     barChartSorting: boolean,
-    barChartFilterStart: string,
-    barChartFilterEnd: string,
     barChartGroupBy: string,
+    barChartDisplayValues: boolean,
     barChartToolbarVisible: boolean,
 }
 
@@ -21,9 +20,8 @@ const initialState: BarChartState = {
     barChartColorX: "#A0A0A0",
     barChartColorY: "#A0A0A0",
     barChartSorting: false,
-    barChartFilterStart: "",
-    barChartFilterEnd: "",
     barChartGroupBy: "",
+    barChartDisplayValues: false,
     barChartToolbarVisible: true,
 };
 
@@ -55,17 +53,13 @@ export const _barChartSlice = createSlice({
         {
             state.barChartSorting = action.payload;
         },
-        setBarChartFilterStart: (state, action: PayloadAction<string>) =>
-        {
-            state.barChartFilterStart = action.payload;
-        },
-        setBarChartFilterEnd: (state, action: PayloadAction<string>) =>
-        {
-            state.barChartFilterEnd = action.payload;
-        },
         setBarChartGroupBy: (state, action: PayloadAction<string>) =>
         {
             state.barChartGroupBy = action.payload;
+        },
+        setBarChartDisplayValues: (state, action: PayloadAction<boolean>) =>
+        {
+            state.barChartDisplayValues = action.payload;
         },
         setBarChartToolbarVisible: (state, action: PayloadAction<boolean>) =>
         {
@@ -74,6 +68,6 @@ export const _barChartSlice = createSlice({
     },
 });
 
-export const { setBarChartData, setBarChartSelectedTable, setBarChartTitle, setBarChartColorX, setBarChartColorY, setBarChartSorting, setBarChartFilterStart, setBarChartFilterEnd, setBarChartGroupBy, setBarChartToolbarVisible } = _barChartSlice.actions;
+export const { setBarChartData, setBarChartSelectedTable, setBarChartTitle, setBarChartColorX, setBarChartColorY, setBarChartSorting, setBarChartGroupBy, setBarChartDisplayValues, setBarChartToolbarVisible } = _barChartSlice.actions;
 
 export default _barChartSlice.reducer;

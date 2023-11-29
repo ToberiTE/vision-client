@@ -9,8 +9,6 @@ interface PieChartState
     pieChartLMin: number;
     pieChartLMax: number;
     pieChartSorting: boolean,
-    pieChartFilterStart: string,
-    pieChartFilterEnd: string,
     pieChartGroupBy: string;
     pieChartToolbarVisible: boolean,
 }
@@ -23,8 +21,6 @@ const initialState: PieChartState = {
     pieChartLMin: 0,
     pieChartLMax: 100,
     pieChartSorting: false,
-    pieChartFilterStart: "",
-    pieChartFilterEnd: "",
     pieChartGroupBy: "",
     pieChartToolbarVisible: true,
 };
@@ -61,14 +57,6 @@ export const _pieChartSlice = createSlice({
         {
             state.pieChartSorting = action.payload;
         },
-        setPieChartFilterStart: (state, action: PayloadAction<string>) =>
-        {
-            state.pieChartFilterStart = action.payload;
-        },
-        setPieChartFilterEnd: (state, action: PayloadAction<string>) =>
-        {
-            state.pieChartFilterEnd = action.payload;
-        },
         setPieChartGroupBy: (state, action: PayloadAction<string>) =>
         {
             state.pieChartGroupBy = action.payload;
@@ -81,6 +69,6 @@ export const _pieChartSlice = createSlice({
     },
 });
 
-export const { setPieChartData, setPieChartSelectedTable, setPieChartTitle, setPieChartColor, setPieChartLMin, setPieChartLMax, setPieChartSorting, setPieChartFilterStart, setPieChartFilterEnd, setPieChartGroupBy, setPieChartToolbarVisible } = _pieChartSlice.actions;
+export const { setPieChartData, setPieChartSelectedTable, setPieChartTitle, setPieChartColor, setPieChartLMin, setPieChartLMax, setPieChartSorting, setPieChartGroupBy, setPieChartToolbarVisible } = _pieChartSlice.actions;
 
 export default _pieChartSlice.reducer;

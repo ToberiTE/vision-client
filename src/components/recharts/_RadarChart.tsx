@@ -8,27 +8,16 @@ import {
   RadarChart,
 } from "recharts";
 import { useSelector } from "react-redux";
-import { RootState } from "../../store";
-import React, { useMemo } from "react";
+import React from "react";
+import { selectRadarChartFields } from "../../reducers/selectors";
 
 interface data {
   [key: string]: any[];
 }
 
 const _RadarChart: React.FC<data> = React.memo(() => {
-  const selector = useSelector((state: RootState) => state._radarChartReducer);
-
-  const memoizedSelector = useMemo(
-    () => selector,
-    [
-      selector.radarChartData,
-      selector.radarChartSelectedTable,
-      selector.radarChartColor,
-    ]
-  );
-
   const { radarChartData, radarChartSelectedTable, radarChartColor } =
-    memoizedSelector;
+    useSelector(selectRadarChartFields);
 
   const index = radarChartData[0] ?? [];
   const label = Object.keys(index)[0];
@@ -41,7 +30,7 @@ const _RadarChart: React.FC<data> = React.memo(() => {
         <PolarAngleAxis dataKey={label} />
         <PolarRadiusAxis />
         <Radar
-          name={radarChartSelectedTable.slice(6)}
+          name={radarChartSelectedTable}
           dataKey={value}
           fill={radarChartColor}
           fillOpacity={0.4}

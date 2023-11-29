@@ -14,23 +14,19 @@ import React from "react";
 import SortIcon from "@mui/icons-material/Sort";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import ValuesIcon from "@mui/icons-material/Pin";
 import { HslaStringColorPicker } from "react-colorful";
 import _AreaChart from "../recharts/_AreaChart";
 import _BarChart from "../recharts/_BarChart";
-import _BrushBarChart from "../recharts/_BrushBarChart";
 import _LineChart from "../recharts/_LineChart";
 import _PieChart from "../recharts/_PieChart";
 import _RadarChart from "../recharts/_RadarChart";
 import _ScatterChart from "../recharts/_ScatterChart";
 
-interface Component {
+export interface Component {
   id: string;
   label: string;
   component: JSX.Element;
-}
-
-interface SortIconProps {
-  onClick: () => void;
 }
 
 interface ColorPickerProps {
@@ -45,7 +41,7 @@ interface FlexBetweenProps {
   children: JSX.Element[];
 }
 
-interface ControlsIconProps {
+interface IconProps {
   onClick: () => void;
 }
 
@@ -71,11 +67,6 @@ const components: Component[] = [
     component: <_BarChart />,
   },
   {
-    id: "bbc",
-    label: "Brush Bar Chart",
-    component: <_BrushBarChart />,
-  },
-  {
     id: "rc",
     label: "Radar Chart",
     component: <_RadarChart />,
@@ -87,11 +78,12 @@ const components: Component[] = [
   },
 ];
 
-const SortDescIcon = React.memo(({ onClick }: SortIconProps) => {
+const SortDescIcon = React.memo(({ onClick }: IconProps): JSX.Element => {
   return (
     <IconButton
       title={"Sort by date: Descending"}
       sx={{
+        ml: "0.5rem",
         transform: "rotateX(180deg)",
       }}
       onClick={onClick}
@@ -101,11 +93,12 @@ const SortDescIcon = React.memo(({ onClick }: SortIconProps) => {
   );
 });
 
-const SortAscIcon = React.memo(({ onClick }: SortIconProps) => {
+const SortAscIcon = React.memo(({ onClick }: IconProps): JSX.Element => {
   return (
     <IconButton
       title={"Sort by date: Ascending"}
       sx={{
+        ml: "0.5rem",
         transform: "rotateX(0)",
       }}
       onClick={onClick}
@@ -147,32 +140,36 @@ const ColorPicker = React.memo(
           input={<OutlinedInput label={label} />}
         >
           <MenuItem value={color} sx={{ display: "none" }} />
-          <Box>
-            <HslaStringColorPicker
-              color={color}
-              onChange={debounce(onChange, 200)}
-            />
-          </Box>
+          <HslaStringColorPicker
+            style={{
+              width: "19.5rem",
+              padding: "0.5rem 1rem 0rem 1rem",
+            }}
+            color={color}
+            onChange={debounce(onChange, 200)}
+          />
         </Select>
       </FormControl>
     );
   }
 );
 
-const FlexBetween = React.memo(({ sx, children }: FlexBetweenProps) => {
-  return (
-    <Box
-      sx={sx}
-      display="flex"
-      alignItems="center"
-      justifyContent="space-between"
-    >
-      {children}
-    </Box>
-  );
-});
+const FlexBetween = React.memo(
+  ({ sx, children }: FlexBetweenProps): JSX.Element => {
+    return (
+      <Box
+        sx={sx}
+        display="flex"
+        alignItems="center"
+        justifyContent="space-between"
+      >
+        {children}
+      </Box>
+    );
+  }
+);
 
-const ControlsHide = React.memo(({ onClick }: ControlsIconProps) => {
+const ControlsHide = React.memo(({ onClick }: IconProps): JSX.Element => {
   return (
     <IconButton title={"Hide controls"} onClick={onClick}>
       <VisibilityOffIcon />
@@ -180,10 +177,18 @@ const ControlsHide = React.memo(({ onClick }: ControlsIconProps) => {
   );
 });
 
-const ControlsShow = React.memo(({ onClick }: ControlsIconProps) => {
+const ControlsShow = React.memo(({ onClick }: IconProps): JSX.Element => {
   return (
     <IconButton title={"Show controls"} onClick={onClick}>
       <VisibilityIcon style={{ opacity: "0.25" }} />
+    </IconButton>
+  );
+});
+
+const ToggleChartValues = React.memo(({ onClick }: IconProps): JSX.Element => {
+  return (
+    <IconButton title={"Toggle chart values"} onClick={onClick}>
+      <ValuesIcon />
     </IconButton>
   );
 });
@@ -198,5 +203,6 @@ export {
   FlexBetween,
   ControlsHide,
   ControlsShow,
+  ToggleChartValues,
   groupByOpt,
 };

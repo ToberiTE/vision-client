@@ -1,6 +1,7 @@
 import {
   Area,
-  AreaChart,
+  ComposedChart,
+  Line,
   Brush,
   CartesianGrid,
   Legend,
@@ -13,40 +14,44 @@ import { useSelector } from "react-redux";
 import { useTheme } from "@mui/material";
 import { useCallback, useMemo, useState } from "react";
 import React from "react";
-import { selectAreaChartFields } from "../../reducers/selectors";
+import { selectComposedChartFields } from "../../reducers/selectors";
 import { CustomLabel, sortChartData } from "./utils";
 interface data {
   [key: string]: any[];
 }
 
-const _AreaChart: React.FC<data> = React.memo(() => {
+const _ComposedChart: React.FC<data> = React.memo(() => {
   const theme = useTheme();
 
   const {
-    areaChartData,
-    areaChartColorX,
-    areaChartColorY,
-    areaChartSorting,
-    areaChartGroupBy,
-    areaChartDisplayValues,
-  } = useSelector(selectAreaChartFields);
+    composedChartData,
+    composedChartColorX,
+    composedChartColorY,
+    composedChartColorZ,
+    composedChartSorting,
+    composedChartGroupBy,
+    composedChartDisplayValues,
+  } = useSelector(selectComposedChartFields);
 
-  const [data, setData] = useState(areaChartData);
+  const [data, setData] = useState(composedChartData);
 
-  const index = areaChartData[0] ?? [];
+  const index = composedChartData[0] ?? [];
   let date = Object.keys(index)[1];
   let x = Object.keys(index)[2];
   let y = Object.keys(index)[3];
+  let z = Object.keys(index)[4];
 
-  if (areaChartGroupBy && areaChartGroupBy !== "None") {
+  if (composedChartGroupBy && composedChartGroupBy !== "None") {
     date = Object.keys(index)[0];
     x = Object.keys(index)[1];
     y = Object.keys(index)[2];
+    z = Object.keys(index)[3];
   }
 
   const [opacity, setOpacity] = useState<any>({
     x: 0,
     y: 0,
+    z: 0,
   });
 
   const memoizedOpacity = useMemo(() => {
@@ -77,28 +82,32 @@ const _AreaChart: React.FC<data> = React.memo(() => {
 
   let showLabelX: boolean = true;
   let showLabelY: boolean = true;
+  let showLabelZ: boolean = true;
   const hsla = /hsla\([^,]+,\s*[0-9]+%?\s*,\s*[0-9]+%?\s*,\s*0\)/;
-  if (hsla.test(areaChartColorX)) {
+  if (hsla.test(composedChartColorX)) {
+    showLabelX = false;
+  }
+  if (hsla.test(composedChartColorY)) {
     showLabelY = false;
   }
-  if (hsla.test(areaChartColorY)) {
-    showLabelX = false;
+  if (hsla.test(composedChartColorZ)) {
+    showLabelZ = false;
   }
 
   useMemo(() => {
     let sortedData = sortChartData(
-      areaChartData,
-      areaChartSorting,
-      areaChartGroupBy
+      composedChartData,
+      composedChartSorting,
+      composedChartGroupBy
     );
     setData(sortedData);
-  }, [areaChartData, areaChartSorting, areaChartGroupBy]);
+  }, [composedChartData, composedChartSorting, composedChartGroupBy]);
 
   return (
     <ResponsiveContainer>
-      <AreaChart data={data.length ? data : areaChartData}>
+      <ComposedChart data={data.length ? data : composedChartData}>
         <XAxis dataKey={date} />
-        <YAxis />
+        <YAxis textAnchor="middle" />
         <CartesianGrid strokeDasharray="1 3" vertical={false} />
         <Tooltip
           contentStyle={{
@@ -106,23 +115,23 @@ const _AreaChart: React.FC<data> = React.memo(() => {
           }}
         />
         <Area
-          name={x}
+          name={z}
           type="monotone"
-          dataKey={x}
-          stroke={areaChartColorX}
+          dataKey={z}
+          stroke={composedChartColorZ}
           strokeOpacity={0}
-          fill={areaChartColorX}
-          fillOpacity={memoizedOpacity[y]}
+          fill={composedChartColorZ}
+          fillOpacity={memoizedOpacity[x] && memoizedOpacity[y]}
           label={
-            showLabelY &&
-            areaChartDisplayValues && (
+            showLabelZ &&
+            composedChartDisplayValues && (
               <CustomLabel
                 textAnchor="middle"
-                value={x}
+                value={z}
                 x={x}
                 y={y}
                 fill={theme.palette.text.primary}
-                opacity={memoizedOpacity[y]}
+                opacity={memoizedOpacity[x] && memoizedOpacity[y]}
                 writingMode={data.length > 20 ? "vertical-rl" : "horizontal"}
               />
             )
@@ -132,20 +141,41 @@ const _AreaChart: React.FC<data> = React.memo(() => {
           name={y}
           type="monotone"
           dataKey={y}
-          stroke={areaChartColorY}
+          stroke={composedChartColorY}
           strokeOpacity={0}
-          fill={areaChartColorY}
-          fillOpacity={memoizedOpacity[x]}
+          fill={composedChartColorY}
+          fillOpacity={memoizedOpacity[x] && memoizedOpacity[z]}
+          label={
+            showLabelY &&
+            composedChartDisplayValues && (
+              <CustomLabel
+                textAnchor="middle"
+                value={y}
+                x={x}
+                y={y}
+                fill={theme.palette.text.primary}
+                opacity={memoizedOpacity[x] && memoizedOpacity[z]}
+                writingMode={data.length > 20 ? "vertical-rl" : "horizontal"}
+              />
+            )
+          }
+        />
+        <Line
+          type="monotone"
+          dot={false}
+          dataKey={x}
+          stroke={composedChartColorX}
+          strokeOpacity={memoizedOpacity[y] && memoizedOpacity[z]}
           label={
             showLabelX &&
-            areaChartDisplayValues && (
+            composedChartDisplayValues && (
               <CustomLabel
                 textAnchor="middle"
                 value={x}
                 x={x}
                 y={y}
                 fill={theme.palette.text.primary}
-                opacity={memoizedOpacity[x]}
+                opacity={memoizedOpacity[y] && memoizedOpacity[z]}
                 writingMode={data.length > 20 ? "vertical-rl" : "horizontal"}
               />
             )
@@ -160,9 +190,9 @@ const _AreaChart: React.FC<data> = React.memo(() => {
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         />
-      </AreaChart>
+      </ComposedChart>
     </ResponsiveContainer>
   );
 });
 
-export default _AreaChart;
+export default _ComposedChart;

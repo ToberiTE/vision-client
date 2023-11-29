@@ -5,12 +5,17 @@ import {
   Legend,
   Cell,
   Tooltip,
+  Brush,
 } from "recharts";
 import { useSelector } from "react-redux";
-import { RootState } from "../../store";
 import { useCallback, useMemo, useState } from "react";
 import { useTheme } from "@mui/material";
 import React from "react";
+import {
+  selectDashboardFields,
+  selectPieChartFields,
+} from "../../reducers/selectors";
+import { sortChartData } from "./utils";
 
 interface data {
   [key: string]: any[];
@@ -19,25 +24,8 @@ interface data {
 const _PieChart: React.FC<data> = React.memo(() => {
   const theme = useTheme();
 
-  const { dashboardLayout } = useSelector(
-    (state: RootState) => state.dashboardReducer
-  );
-
-  const selector = useSelector((state: RootState) => state._pieChartReducer);
-
-  const memoizedSelector = useMemo(
-    () => selector,
-    [
-      selector.pieChartData,
-      selector.pieChartColor,
-      selector.pieChartLMin,
-      selector.pieChartLMax,
-      selector.pieChartSorting,
-      selector.pieChartFilterStart,
-      selector.pieChartFilterEnd,
-      selector.pieChartGroupBy,
-    ]
-  );
+  const { dashboardLayout, selectedComponentIds, toggleComponentFullscreen } =
+    useSelector(selectDashboardFields);
 
   const {
     pieChartData,
@@ -45,10 +33,8 @@ const _PieChart: React.FC<data> = React.memo(() => {
     pieChartLMin,
     pieChartLMax,
     pieChartSorting,
-    pieChartFilterStart,
-    pieChartFilterEnd,
     pieChartGroupBy,
-  } = memoizedSelector;
+  } = useSelector(selectPieChartFields);
 
   const [data, setData] = useState(pieChartData);
   const [hoverIndex, setHoverIndex] = useState<any>(null);
@@ -66,37 +52,30 @@ const _PieChart: React.FC<data> = React.memo(() => {
   let dataToMap;
   data.length > 0 ? (dataToMap = data) : pieChartData;
 
-  let legendLayout: boolean = data.length > 40 ? true : false;
+  let legendLayout: boolean = data.length > 30 ? true : false;
 
   const legendStyle = {
     height: "80%",
     overflow: "auto",
-    width: dashboardLayout === 0 ? "10%" : "fit-content",
-    marginRight: dashboardLayout === 0 ? "5%" : 0,
+    width: "fit-content",
+    paddingRight:
+      dashboardLayout === 1 && selectedComponentIds.length > 1 ? "0" : "2rem",
+    marginRight:
+      dashboardLayout === 0 ||
+      toggleComponentFullscreen === "pc" ||
+      (dashboardLayout === 1 && selectedComponentIds.length < 2)
+        ? "5%"
+        : 0,
   };
 
   useMemo(() => {
-    let arrayData = Object.values(pieChartData);
-
-    if (pieChartFilterStart || pieChartFilterEnd) {
-      arrayData = arrayData.filter((entry) => {
-        if (pieChartFilterStart && entry.date < pieChartFilterStart)
-          return false;
-        if (pieChartFilterEnd && entry.date > pieChartFilterEnd) return false;
-        return true;
-      });
-    }
-
-    arrayData.sort((a, b) => {
-      if (pieChartSorting) {
-        return a.date > b.date ? 1 : a.date < b.date ? -1 : 0;
-      } else {
-        return b.date > a.date ? 1 : b.date < a.date ? -1 : 0;
-      }
-    });
-
-    setData(arrayData);
-  }, [pieChartData, pieChartSorting, pieChartFilterStart, pieChartFilterEnd]);
+    let sortedData = sortChartData(
+      pieChartData,
+      pieChartSorting,
+      pieChartGroupBy
+    );
+    setData(sortedData);
+  }, [pieChartData, pieChartSorting, pieChartGroupBy]);
 
   const cellColors = useMemo(() => {
     const shades = [];
@@ -119,13 +98,12 @@ const _PieChart: React.FC<data> = React.memo(() => {
     pieChartLMin,
     pieChartLMax,
     pieChartSorting,
-    pieChartFilterStart,
-    pieChartFilterEnd,
+    pieChartGroupBy,
   ]);
 
   const handleMouseEnter = useCallback((_: any, i: any) => {
-    setHoverIndex(i + 1);
     setShouldAnimate(false);
+    setHoverIndex(i + 1);
   }, []);
 
   const handleMouseLeave = useCallback(() => {
@@ -139,6 +117,11 @@ const _PieChart: React.FC<data> = React.memo(() => {
   return (
     <ResponsiveContainer>
       <PieChart>
+        <Brush
+          dataKey={date}
+          fill={theme.palette.background.paper}
+          height={15}
+        />
         <Pie
           isAnimationActive={shouldAnimate}
           blendStroke

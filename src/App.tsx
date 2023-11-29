@@ -112,7 +112,7 @@ function App(_Props: { toggleColorMode: void }) {
                 >
                   <ColorModeContext.Provider value={colorMode}>
                     <ThemeProvider theme={theme}>
-                      <CssBaseline />
+                      <CssBaseline enableColorScheme />
                       <Navbar />
                       <Sidenav sidenavTableList={sidenavTableList} />
                       <Routes>

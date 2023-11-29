@@ -10,11 +10,11 @@ import {
   Brush,
 } from "recharts";
 import { useSelector } from "react-redux";
-import { RootState } from "../../store";
 import { useTheme } from "@mui/material";
 import { useMemo, useState } from "react";
 import React from "react";
-import { customLabel } from "./utils";
+import { CustomLabel, sortChartData } from "./utils";
+import { selectLineChartFields } from "../../reducers/selectors";
 
 interface data {
   [key: string]: any[];
@@ -23,30 +23,14 @@ interface data {
 const _LineChart: React.FC<data> = React.memo(() => {
   const theme = useTheme();
 
-  const selector = useSelector((state: RootState) => state._lineChartReducer);
-
-  const memoizedSelector = useMemo(
-    () => selector,
-    [
-      selector.lineChartData,
-      selector.lineChartColorX,
-      selector.lineChartColorY,
-      selector.lineChartSorting,
-      selector.lineChartFilterStart,
-      selector.lineChartFilterEnd,
-      selector.lineChartGroupBy,
-    ]
-  );
-
   const {
     lineChartData,
     lineChartColorX,
     lineChartColorY,
     lineChartSorting,
-    lineChartFilterStart,
-    lineChartFilterEnd,
     lineChartGroupBy,
-  } = memoizedSelector;
+    lineChartDisplayValues,
+  } = useSelector(selectLineChartFields);
 
   const [data, setData] = useState(lineChartData);
 
@@ -88,34 +72,25 @@ const _LineChart: React.FC<data> = React.memo(() => {
     });
   };
 
-  const CustomLabel = useMemo(() => customLabel, []);
+  let showLabelX: boolean = true;
+  let showLabelY: boolean = true;
+  const hsla = /hsla\([^,]+,\s*[0-9]+%?\s*,\s*[0-9]+%?\s*,\s*0\)/;
+  if (hsla.test(lineChartColorX)) {
+    showLabelY = false;
+  }
+  if (hsla.test(lineChartColorY)) {
+    showLabelX = false;
+  }
 
   useMemo(() => {
-    let arrayData = Object.values(lineChartData);
+    let sortedData = sortChartData(
+      lineChartData,
+      lineChartSorting,
+      lineChartGroupBy
+    );
+    setData(sortedData);
+  }, [lineChartData, lineChartSorting, lineChartGroupBy]);
 
-    if (lineChartFilterStart || lineChartFilterEnd) {
-      arrayData = arrayData.filter((entry) => {
-        if (lineChartFilterStart && entry.date < lineChartFilterStart)
-          return false;
-        if (lineChartFilterEnd && entry.date > lineChartFilterEnd) return false;
-        return true;
-      });
-    }
-    arrayData.sort((a, b) => {
-      if (lineChartSorting) {
-        return a.date > b.date ? 1 : a.date < b.date ? -1 : 0;
-      } else {
-        return b.date > a.date ? 1 : b.date < a.date ? -1 : 0;
-      }
-    });
-
-    setData(arrayData);
-  }, [
-    lineChartData,
-    lineChartSorting,
-    lineChartFilterStart,
-    lineChartFilterEnd,
-  ]);
   return (
     <ResponsiveContainer>
       <LineChart data={data.length ? data : lineChartData}>
@@ -129,15 +104,18 @@ const _LineChart: React.FC<data> = React.memo(() => {
           stroke={lineChartColorX}
           strokeOpacity={memoizedOpacity[y]}
           label={
-            <CustomLabel
-              x={x}
-              y={y}
-              textAnchor="middle"
-              writingMode=""
-              value={x}
-              fill={lineChartColorX}
-              opacity={memoizedOpacity[y]}
-            />
+            showLabelY &&
+            lineChartDisplayValues && (
+              <CustomLabel
+                textAnchor="middle"
+                value={x}
+                x={x}
+                y={y}
+                fill={theme.palette.text.primary}
+                opacity={memoizedOpacity[y]}
+                writingMode={data.length > 20 ? "vertical-rl" : "horizontal"}
+              />
+            )
           }
         />
         <Line
@@ -147,18 +125,25 @@ const _LineChart: React.FC<data> = React.memo(() => {
           stroke={lineChartColorY}
           strokeOpacity={memoizedOpacity[x]}
           label={
-            <CustomLabel
-              x={x}
-              y={y}
-              textAnchor="middle"
-              writingMode=""
-              value={y}
-              fill={lineChartColorY}
-              opacity={memoizedOpacity[x]}
-            />
+            showLabelX &&
+            lineChartDisplayValues && (
+              <CustomLabel
+                textAnchor="middle"
+                value={x}
+                x={x}
+                y={y}
+                fill={theme.palette.text.primary}
+                opacity={memoizedOpacity[x]}
+                writingMode={data.length > 20 ? "vertical-rl" : "horizontal"}
+              />
+            )
           }
         />
-        <Brush dataKey={date} stroke={theme.palette.primary.main} height={20} />
+        <Brush
+          dataKey={date}
+          fill={theme.palette.background.default}
+          height={15}
+        />
         <Legend
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}

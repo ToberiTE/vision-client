@@ -8,9 +8,8 @@ interface AreaChartState
     areaChartColorX: string,
     areaChartColorY: string,
     areaChartSorting: boolean,
-    areaChartFilterStart: string,
-    areaChartFilterEnd: string,
     areaChartGroupBy: string,
+    areaChartDisplayValues: boolean,
     areaChartToolbarVisible: boolean,
 }
 
@@ -21,9 +20,8 @@ const initialState: AreaChartState = {
     areaChartColorX: "#A0A0A0",
     areaChartColorY: "#A0A0A0",
     areaChartSorting: false,
-    areaChartFilterStart: "",
-    areaChartFilterEnd: "",
     areaChartGroupBy: "",
+    areaChartDisplayValues: false,
     areaChartToolbarVisible: true,
 };
 
@@ -55,17 +53,13 @@ export const _areaChartSlice = createSlice({
         {
             state.areaChartSorting = action.payload;
         },
-        setAreaChartFilterStart: (state, action: PayloadAction<string>) =>
-        {
-            state.areaChartFilterStart = action.payload;
-        },
-        setAreaChartFilterEnd: (state, action: PayloadAction<string>) =>
-        {
-            state.areaChartFilterEnd = action.payload;
-        },
         setAreaChartGroupBy: (state, action: PayloadAction<string>) =>
         {
             state.areaChartGroupBy = action.payload;
+        },
+        setAreaChartDisplayValues: (state, action: PayloadAction<boolean>) =>
+        {
+            state.areaChartDisplayValues = action.payload;
         },
         setAreaChartToolbarVisible: (state, action: PayloadAction<boolean>) =>
         {
@@ -74,6 +68,6 @@ export const _areaChartSlice = createSlice({
     },
 });
 
-export const { setAreaChartData, setAreaChartSelectedTable, setAreaChartTitle, setAreaChartColorX, setAreaChartColorY, setAreaChartSorting, setAreaChartFilterStart, setAreaChartFilterEnd, setAreaChartGroupBy, setAreaChartToolbarVisible } = _areaChartSlice.actions;
+export const { setAreaChartData, setAreaChartSelectedTable, setAreaChartTitle, setAreaChartColorX, setAreaChartColorY, setAreaChartSorting, setAreaChartGroupBy, setAreaChartDisplayValues, setAreaChartToolbarVisible } = _areaChartSlice.actions;
 
 export default _areaChartSlice.reducer;

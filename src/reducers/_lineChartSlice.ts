@@ -8,9 +8,8 @@ interface LineChartState
     lineChartColorX: string,
     lineChartColorY: string,
     lineChartSorting: boolean,
-    lineChartFilterStart: string,
-    lineChartFilterEnd: string,
     lineChartGroupBy: string,
+    lineChartDisplayValues: boolean,
     lineChartToolbarVisible: boolean,
 }
 
@@ -21,9 +20,8 @@ const initialState: LineChartState = {
     lineChartColorX: "#A0A0A0",
     lineChartColorY: "#A0A0A0",
     lineChartSorting: false,
-    lineChartFilterStart: "",
-    lineChartFilterEnd: "",
     lineChartGroupBy: "",
+    lineChartDisplayValues: false,
     lineChartToolbarVisible: true,
 };
 
@@ -55,17 +53,13 @@ export const _lineChartSlice = createSlice({
         {
             state.lineChartSorting = action.payload;
         },
-        setLineChartFilterStart: (state, action: PayloadAction<string>) =>
-        {
-            state.lineChartFilterStart = action.payload;
-        },
-        setLineChartFilterEnd: (state, action: PayloadAction<string>) =>
-        {
-            state.lineChartFilterEnd = action.payload;
-        },
         setLineChartGroupBy: (state, action: PayloadAction<string>) =>
         {
             state.lineChartGroupBy = action.payload;
+        },
+        setLineChartDisplayValues: (state, action: PayloadAction<boolean>) =>
+        {
+            state.lineChartDisplayValues = action.payload;
         },
         setLineChartToolbarVisible: (state, action: PayloadAction<boolean>) =>
         {
@@ -74,6 +68,6 @@ export const _lineChartSlice = createSlice({
     },
 });
 
-export const { setLineChartData, setLineChartSelectedTable, setLineChartTitle, setLineChartColorX, setLineChartColorY, setLineChartSorting, setLineChartFilterStart, setLineChartFilterEnd, setLineChartGroupBy, setLineChartToolbarVisible } = _lineChartSlice.actions;
+export const { setLineChartData, setLineChartSelectedTable, setLineChartTitle, setLineChartColorX, setLineChartColorY, setLineChartSorting, setLineChartGroupBy, setLineChartDisplayValues, setLineChartToolbarVisible } = _lineChartSlice.actions;
 
 export default _lineChartSlice.reducer;

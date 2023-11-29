@@ -16,7 +16,7 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useMsal } from "@azure/msal-react";
 import SettingsIcon from "@mui/icons-material/Settings";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
@@ -26,11 +26,11 @@ import InfoIcon from "@mui/icons-material/Info";
 import ViewModuleIcon from "@mui/icons-material/ViewModule";
 import ViewListIcon from "@mui/icons-material/ViewList";
 import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "../../store";
 import {
   setComponentTables,
   setDashboardLayout,
   setSelectedComponentIds,
+  setToggleComponentFullscreen,
 } from "../../reducers/dashboardSlice";
 import _ScatterChart from "../recharts/_ScatterChart";
 import _AreaChart from "../recharts/_AreaChart";
@@ -38,10 +38,10 @@ import _LineChart from "../recharts/_LineChart";
 import _BarChart from "../recharts/_BarChart";
 import _RadarChart from "../recharts/_RadarChart";
 import _PieChart from "../recharts/_PieChart";
-import _BrushBarChart from "../recharts/_BrushBarChart";
 import {
   setScatterChartColor,
   setScatterChartData,
+  setScatterChartDisplayValues,
   setScatterChartSelectedTable,
   setScatterChartTitle,
   setScatterChartToolbarVisible,
@@ -53,10 +53,9 @@ import {
   setAreaChartSelectedTable,
   setAreaChartSorting,
   setAreaChartTitle,
-  setAreaChartFilterStart,
-  setAreaChartFilterEnd,
   setAreaChartGroupBy,
   setAreaChartToolbarVisible,
+  setAreaChartDisplayValues,
 } from "../../reducers/_areaChartSlice";
 import {
   setLineChartColorX,
@@ -65,10 +64,9 @@ import {
   setLineChartSelectedTable,
   setLineChartSorting,
   setLineChartTitle,
-  setLineChartFilterStart,
-  setLineChartFilterEnd,
   setLineChartGroupBy,
   setLineChartToolbarVisible,
+  setLineChartDisplayValues,
 } from "../../reducers/_lineChartSlice";
 import {
   setBarChartColorX,
@@ -77,23 +75,10 @@ import {
   setBarChartSelectedTable,
   setBarChartSorting,
   setBarChartTitle,
-  setBarChartFilterStart,
-  setBarChartFilterEnd,
   setBarChartGroupBy,
   setBarChartToolbarVisible,
+  setBarChartDisplayValues,
 } from "../../reducers/_barChartSlice";
-import {
-  setBrushBarChartColorX,
-  setBrushBarChartColorY,
-  setBrushBarChartData,
-  setBrushBarChartSelectedTable,
-  setBrushBarChartSorting,
-  setBrushBarChartTitle,
-  setBrushBarChartFilterStart,
-  setBrushBarChartFilterEnd,
-  setBrushBarChartGroupBy,
-  setBrushBarChartToolbarVisible,
-} from "../../reducers/_brushBarChartSlice";
 import {
   setRadarChartColor,
   setRadarChartData,
@@ -112,11 +97,7 @@ import {
   setPieChartGroupBy,
   setPieChartToolbarVisible,
   setPieChartSorting,
-  setPieChartFilterStart,
-  setPieChartFilterEnd,
 } from "../../reducers/_pieChartSlice";
-import { DatePicker } from "@mui/x-date-pickers";
-import dayjs from "dayjs";
 import { AnyAction, Dispatch } from "@reduxjs/toolkit";
 import React from "react";
 import {
@@ -128,7 +109,17 @@ import {
   ControlsShow,
   groupByOpt,
   components,
+  ToggleChartValues,
 } from "../dashboard/DashboardComponents";
+import {
+  selectDashboardFields,
+  selectAreaChartFields,
+  selectLineChartFields,
+  selectBarChartFields,
+  selectRadarChartFields,
+  selectPieChartFields,
+  selectScatterChartFields,
+} from "../../reducers/selectors";
 
 const Dashboard: React.FC = React.memo(() => {
   //#region hooks
@@ -141,42 +132,17 @@ const Dashboard: React.FC = React.memo(() => {
   const [selectedListItems, setSelectedListItems] = useState<string[]>([]);
   const [openComponentSettings, setOpenComponentSettings] =
     useState<string>("");
-  const [toggleComponentFullscreen, setToggleComponentFullscreen] =
-    useState<string>("");
 
   useEffect(() => {
     fetchComponentTables();
   }, []);
 
-  const rootSelector = useSelector((state: RootState) => state);
-
-  const memoizedRootSelector = useMemo(
-    () => rootSelector,
-    [
-      rootSelector.dashboardReducer,
-      rootSelector._areaChartReducer,
-      rootSelector._lineChartReducer,
-      rootSelector._barChartReducer,
-      rootSelector._brushBarChartReducer,
-      rootSelector._radarChartReducer,
-      rootSelector._pieChartReducer,
-      rootSelector._scatterChartReducer,
-    ]
-  );
-
   const {
-    dashboardReducer,
-    _areaChartReducer,
-    _lineChartReducer,
-    _barChartReducer,
-    _brushBarChartReducer,
-    _radarChartReducer,
-    _pieChartReducer,
-    _scatterChartReducer,
-  } = memoizedRootSelector;
-
-  const { dashboardLayout, selectedComponentIds, componentTables } =
-    dashboardReducer;
+    dashboardLayout,
+    selectedComponentIds,
+    componentTables,
+    toggleComponentFullscreen,
+  } = useSelector(selectDashboardFields);
 
   const {
     areaChartSelectedTable,
@@ -184,12 +150,10 @@ const Dashboard: React.FC = React.memo(() => {
     areaChartColorX,
     areaChartColorY,
     areaChartSorting,
-    areaChartData,
-    areaChartFilterStart,
-    areaChartFilterEnd,
     areaChartGroupBy,
+    areaChartDisplayValues,
     areaChartToolbarVisible,
-  } = _areaChartReducer;
+  } = useSelector(selectAreaChartFields);
 
   const {
     lineChartSelectedTable,
@@ -197,12 +161,10 @@ const Dashboard: React.FC = React.memo(() => {
     lineChartColorX,
     lineChartColorY,
     lineChartSorting,
-    lineChartData,
-    lineChartFilterStart,
-    lineChartFilterEnd,
-    lineChartToolbarVisible,
     lineChartGroupBy,
-  } = _lineChartReducer;
+    lineChartDisplayValues,
+    lineChartToolbarVisible,
+  } = useSelector(selectLineChartFields);
 
   const {
     barChartSelectedTable,
@@ -210,25 +172,10 @@ const Dashboard: React.FC = React.memo(() => {
     barChartColorX,
     barChartColorY,
     barChartSorting,
-    barChartData,
-    barChartFilterStart,
-    barChartFilterEnd,
     barChartGroupBy,
+    barChartDisplayValues,
     barChartToolbarVisible,
-  } = _barChartReducer;
-
-  const {
-    brushBarChartSelectedTable,
-    brushBarChartTitle,
-    brushBarChartColorX,
-    brushBarChartColorY,
-    brushBarChartSorting,
-    brushBarChartData,
-    brushBarChartFilterStart,
-    brushBarChartFilterEnd,
-    brushBarChartToolbarVisible,
-    brushBarChartGroupBy,
-  } = _brushBarChartReducer;
+  } = useSelector(selectBarChartFields);
 
   const {
     radarChartSelectedTable,
@@ -236,8 +183,7 @@ const Dashboard: React.FC = React.memo(() => {
     radarChartColor,
     radarChartToolbarVisible,
     radarChartGroupBy,
-  } = _radarChartReducer;
-
+  } = useSelector(selectRadarChartFields);
   const {
     pieChartSelectedTable,
     pieChartTitle,
@@ -245,45 +191,16 @@ const Dashboard: React.FC = React.memo(() => {
     pieChartLMin,
     pieChartLMax,
     pieChartSorting,
-    pieChartData,
-    pieChartFilterStart,
-    pieChartFilterEnd,
     pieChartToolbarVisible,
     pieChartGroupBy,
-  } = _pieChartReducer;
-
+  } = useSelector(selectPieChartFields);
   const {
     scatterChartSelectedTable,
     scatterChartTitle,
     scatterChartColor,
+    scatterChartDisplayValues,
     scatterChartToolbarVisible,
-  } = _scatterChartReducer;
-
-  const areaChartDates = Object.values(areaChartData).map((p) =>
-    dayjs(p.date).valueOf()
-  );
-  const areaChartMinDate = Math.min(...areaChartDates);
-  const areaChartMaxDate = Math.max(...areaChartDates);
-  const lineChartDates = Object.values(lineChartData).map((p) =>
-    dayjs(p.date).valueOf()
-  );
-  const lineChartMinDate = Math.min(...lineChartDates);
-  const lineChartMaxDate = Math.max(...lineChartDates);
-  const barChartDates = Object.values(barChartData).map((p) =>
-    dayjs(p.date).valueOf()
-  );
-  const barChartMinDate = Math.min(...barChartDates);
-  const barChartMaxDate = Math.max(...barChartDates);
-  const brushBarChartDates = Object.values(brushBarChartData).map((p) =>
-    dayjs(p.date).valueOf()
-  );
-  const brushBarChartMinDate = Math.min(...brushBarChartDates);
-  const brushBarChartMaxDate = Math.max(...brushBarChartDates);
-  const pieChartDates = Object.values(pieChartData).map((p) =>
-    dayjs(p.date).valueOf()
-  );
-  const pieChartMinDate = Math.min(...pieChartDates);
-  const pieChartMaxDate = Math.max(...pieChartDates);
+  } = useSelector(selectScatterChartFields);
   //#endregion
 
   //#region handlers
@@ -323,17 +240,11 @@ const Dashboard: React.FC = React.memo(() => {
         case "bc":
           dispatch(setBarChartData(data));
           break;
-        case "bbc":
-          dispatch(setBrushBarChartData(data));
-          break;
         case "rc":
           dispatch(setRadarChartData(data));
           break;
         case "pc":
           dispatch(setPieChartData(data));
-          break;
-        default:
-          break;
       }
     }
   };
@@ -359,11 +270,15 @@ const Dashboard: React.FC = React.memo(() => {
             case "color":
               dispatch(setScatterChartColor(arg0));
               break;
+            case "values":
+              dispatch(
+                setScatterChartDisplayValues(!scatterChartDisplayValues)
+              );
+              break;
             case "toolbar":
               dispatch(
                 setScatterChartToolbarVisible(!scatterChartToolbarVisible)
               );
-              break;
           }
           break;
         case "ac":
@@ -382,27 +297,15 @@ const Dashboard: React.FC = React.memo(() => {
             case "sort":
               dispatch(setAreaChartSorting(!areaChartSorting));
               break;
-            case "filter":
-              arg0 &&
-                dispatch(
-                  setAreaChartFilterStart(
-                    dayjs(arg0).format("YYYY-MM-DDTHH:mm:ss")
-                  )
-                );
-              arg1 &&
-                dispatch(
-                  setAreaChartFilterEnd(
-                    dayjs(arg1).format("YYYY-MM-DDTHH:mm:ss")
-                  )
-                );
-              break;
-            case "toolbar":
-              dispatch(setAreaChartToolbarVisible(!areaChartToolbarVisible));
-              break;
             case "group":
               fetchSelectedTable(id, arg0, arg1);
               dispatch(setAreaChartGroupBy(arg1));
               break;
+            case "values":
+              dispatch(setAreaChartDisplayValues(!areaChartDisplayValues));
+              break;
+            case "toolbar":
+              dispatch(setAreaChartToolbarVisible(!areaChartToolbarVisible));
           }
           break;
         case "lc":
@@ -421,27 +324,15 @@ const Dashboard: React.FC = React.memo(() => {
             case "sort":
               dispatch(setLineChartSorting(!lineChartSorting));
               break;
-            case "filter":
-              arg0 &&
-                dispatch(
-                  setLineChartFilterStart(
-                    dayjs(arg0).format("YYYY-MM-DDTHH:mm:ss")
-                  )
-                );
-              arg1 &&
-                dispatch(
-                  setLineChartFilterEnd(
-                    dayjs(arg1).format("YYYY-MM-DDTHH:mm:ss")
-                  )
-                );
-              break;
-            case "toolbar":
-              dispatch(setLineChartToolbarVisible(!lineChartToolbarVisible));
-              break;
             case "group":
               fetchSelectedTable(id, arg0, arg1);
               dispatch(setLineChartGroupBy(arg1));
               break;
+            case "values":
+              dispatch(setLineChartDisplayValues(!lineChartDisplayValues));
+              break;
+            case "toolbar":
+              dispatch(setLineChartToolbarVisible(!lineChartToolbarVisible));
           }
           break;
         case "bc":
@@ -460,68 +351,15 @@ const Dashboard: React.FC = React.memo(() => {
             case "sort":
               dispatch(setBarChartSorting(!barChartSorting));
               break;
-            case "filter":
-              arg0 &&
-                dispatch(
-                  setBarChartFilterStart(
-                    dayjs(arg0).format("YYYY-MM-DDTHH:mm:ss")
-                  )
-                );
-              arg1 &&
-                dispatch(
-                  setBarChartFilterEnd(
-                    dayjs(arg1).format("YYYY-MM-DDTHH:mm:ss")
-                  )
-                );
-              break;
-            case "toolbar":
-              dispatch(setBarChartToolbarVisible(!barChartToolbarVisible));
-              break;
             case "group":
               fetchSelectedTable(id, arg0, arg1);
               dispatch(setBarChartGroupBy(arg1));
               break;
-          }
-          break;
-        case "bbc":
-          switch (action) {
-            case "table":
-              fetchSelectedTable(id, arg0);
-              dispatch(setBrushBarChartSelectedTable(arg0));
-              break;
-            case "title":
-              dispatch(setBrushBarChartTitle(arg0));
-              break;
-            case "color":
-              arg0 && dispatch(setBrushBarChartColorX(arg0));
-              arg1 && dispatch(setBrushBarChartColorY(arg1));
-              break;
-            case "sort":
-              dispatch(setBrushBarChartSorting(!brushBarChartSorting));
-              break;
-            case "filter":
-              arg0 &&
-                dispatch(
-                  setBrushBarChartFilterStart(
-                    dayjs(arg0).format("YYYY-MM-DDTHH:mm:ss")
-                  )
-                );
-              arg1 &&
-                dispatch(
-                  setBrushBarChartFilterEnd(
-                    dayjs(arg1).format("YYYY-MM-DDTHH:mm:ss")
-                  )
-                );
+            case "values":
+              dispatch(setBarChartDisplayValues(!barChartDisplayValues));
               break;
             case "toolbar":
-              dispatch(
-                setBrushBarChartToolbarVisible(!brushBarChartToolbarVisible)
-              );
-              break;
-            case "group":
-              fetchSelectedTable(id, arg0, arg1);
-              dispatch(setBrushBarChartGroupBy(arg1));
-              break;
+              dispatch(setBarChartToolbarVisible(!barChartToolbarVisible));
           }
           break;
         case "rc":
@@ -536,13 +374,12 @@ const Dashboard: React.FC = React.memo(() => {
             case "color":
               dispatch(setRadarChartColor(arg0));
               break;
-            case "toolbar":
-              dispatch(setRadarChartToolbarVisible(!radarChartToolbarVisible));
-              break;
             case "group":
               fetchSelectedTable(id, arg0, arg1);
               dispatch(setRadarChartGroupBy(arg1));
               break;
+            case "toolbar":
+              dispatch(setRadarChartToolbarVisible(!radarChartToolbarVisible));
           }
           break;
         case "pc":
@@ -566,30 +403,13 @@ const Dashboard: React.FC = React.memo(() => {
             case "sort":
               dispatch(setPieChartSorting(!pieChartSorting));
               break;
-            case "filter":
-              arg0 &&
-                dispatch(
-                  setPieChartFilterStart(
-                    dayjs(arg0).format("YYYY-MM-DDTHH:mm:ss")
-                  )
-                );
-              arg1 &&
-                dispatch(
-                  setPieChartFilterEnd(
-                    dayjs(arg1).format("YYYY-MM-DDTHH:mm:ss")
-                  )
-                );
-              break;
-            case "toolbar":
-              dispatch(setPieChartToolbarVisible(!pieChartToolbarVisible));
-              break;
             case "group":
               fetchSelectedTable(id, arg0, arg1);
               dispatch(setPieChartGroupBy(arg1));
               break;
+            case "toolbar":
+              dispatch(setPieChartToolbarVisible(!pieChartToolbarVisible));
           }
-          break;
-        default:
           break;
       }
     }
@@ -599,8 +419,8 @@ const Dashboard: React.FC = React.memo(() => {
     setOpenComponentSettings(id);
   };
 
-  const handleToggleComponentFullscreen = (id: string): void => {
-    setToggleComponentFullscreen(id);
+  const handleToggleComponentFullscreen = (id: string) => {
+    dispatch(setToggleComponentFullscreen(id));
   };
 
   const handleLayoutChange = (layout: number): void => {
@@ -634,7 +454,7 @@ const Dashboard: React.FC = React.memo(() => {
     >
       <Box display="flex" alignItems="center" gap="2rem" py="0.75rem" pl={4}>
         <FormControl>
-          <InputLabel aria-invalid id="c">
+          <InputLabel aria-invalid id="components">
             Components
           </InputLabel>
           <Select
@@ -643,7 +463,7 @@ const Dashboard: React.FC = React.memo(() => {
               height: "3.5rem",
             }}
             multiple
-            labelId="c"
+            labelId="components"
             value={[]}
             input={<OutlinedInput label="Components" />}
           >
@@ -699,7 +519,7 @@ const Dashboard: React.FC = React.memo(() => {
                 ? "1fr 1fr 1fr"
                 : lgScreen &&
                   dashboardLayout === 1 &&
-                  selectedComponents.length >= 2
+                  selectedComponents.length === 2
                 ? "1fr 1fr"
                 : "100%",
             gridAutoRows:
@@ -749,7 +569,6 @@ const Dashboard: React.FC = React.memo(() => {
                     : dashboardLayout === 1 && selectedComponents.length >= 2
                     ? "auto"
                     : "100%",
-
                 minWidth:
                   toggleComponentFullscreen === component.id
                     ? "100%"
@@ -770,8 +589,7 @@ const Dashboard: React.FC = React.memo(() => {
                     : "16 / 9",
                 position:
                   toggleComponentFullscreen === component.id ? "fixed" : "",
-                top: toggleComponentFullscreen === component.id ? "0" : "",
-                left: toggleComponentFullscreen === component.id ? "0" : "",
+                inset: toggleComponentFullscreen === component.id ? "0" : "",
                 zIndex:
                   toggleComponentFullscreen === component.id ? "999999" : "",
               }}
@@ -785,7 +603,8 @@ const Dashboard: React.FC = React.memo(() => {
                   columnGap: "1rem",
                   rowGap: "0.5rem",
                   gridTemplateColumns:
-                    (dashboardLayout === 0 && lgScreen) ||
+                    dashboardLayout === 0 ||
+                    toggleComponentFullscreen === component.id ||
                     (dashboardLayout === 1 &&
                       lgScreen &&
                       selectedComponents.length === 1) ||
@@ -797,7 +616,6 @@ const Dashboard: React.FC = React.memo(() => {
                 }}
               >
                 {/* GRID ROW TOP */}
-
                 <Typography variant="body1">
                   {component.id === "sc"
                     ? scatterChartTitle
@@ -807,8 +625,6 @@ const Dashboard: React.FC = React.memo(() => {
                     ? lineChartTitle
                     : component.id === "bc"
                     ? barChartTitle
-                    : component.id === "bbc"
-                    ? brushBarChartTitle
                     : component.id === "rc"
                     ? radarChartTitle
                     : component.id === "pc"
@@ -831,19 +647,28 @@ const Dashboard: React.FC = React.memo(() => {
                         (component.id === "ac" && areaChartToolbarVisible) ||
                         (component.id === "lc" && lineChartToolbarVisible) ||
                         (component.id === "bc" && barChartToolbarVisible) ||
-                        (component.id === "bbc" &&
-                          brushBarChartToolbarVisible) ||
                         (component.id === "rc" && radarChartToolbarVisible) ||
                         (component.id === "pc" && pieChartToolbarVisible)
                           ? "flex"
                           : "none",
                     }}
                   >
+                    {/* TOOGLE VALUES ICON */}
+                    {component.id === "sc" ||
+                    component.id === "ac" ||
+                    component.id === "lc" ||
+                    component.id === "bc" ? (
+                      <ToggleChartValues
+                        onClick={() =>
+                          handleComponentUpdate(component.id, "values")
+                        }
+                      />
+                    ) : null}
+
                     {/* SORT ICONS */}
                     {(component.id === "ac" && areaChartSorting) ||
                     (component.id === "lc" && lineChartSorting) ||
                     (component.id === "bc" && barChartSorting) ||
-                    (component.id === "bbc" && brushBarChartSorting) ||
                     (component.id === "pc" && pieChartSorting) ? (
                       <SortDescIcon
                         onClick={() =>
@@ -853,7 +678,6 @@ const Dashboard: React.FC = React.memo(() => {
                     ) : (component.id === "ac" && !areaChartSorting) ||
                       (component.id === "lc" && !lineChartSorting) ||
                       (component.id === "bc" && !barChartSorting) ||
-                      (component.id === "bbc" && !brushBarChartSorting) ||
                       (component.id === "pc" && !pieChartSorting) ? (
                       <SortAscIcon
                         onClick={() =>
@@ -863,7 +687,6 @@ const Dashboard: React.FC = React.memo(() => {
                     ) : null}
 
                     {/* FULLSCREEN ICONS */}
-
                     {toggleComponentFullscreen.length === 0 ? (
                       <IconButton
                         title="Enter fullscreen"
@@ -905,7 +728,6 @@ const Dashboard: React.FC = React.memo(() => {
                   (component.id === "ac" && areaChartToolbarVisible) ||
                   (component.id === "lc" && lineChartToolbarVisible) ||
                   (component.id === "bc" && barChartToolbarVisible) ||
-                  (component.id === "bbc" && brushBarChartToolbarVisible) ||
                   (component.id === "rc" && radarChartToolbarVisible) ||
                   (component.id === "pc" && pieChartToolbarVisible) ? (
                     <ControlsHide
@@ -927,7 +749,8 @@ const Dashboard: React.FC = React.memo(() => {
                   sx={{
                     justifyContent: "end",
                     gridRow:
-                      (dashboardLayout === 0 && lgScreen) ||
+                      dashboardLayout === 0 ||
+                      toggleComponentFullscreen === component.id ||
                       (dashboardLayout === 1 &&
                         lgScreen &&
                         selectedComponents.length === 1) ||
@@ -937,7 +760,8 @@ const Dashboard: React.FC = React.memo(() => {
                         ? "1"
                         : "2",
                     gridColumn:
-                      (dashboardLayout === 0 && lgScreen) ||
+                      dashboardLayout === 0 ||
+                      toggleComponentFullscreen === component.id ||
                       (dashboardLayout === 1 &&
                         lgScreen &&
                         selectedComponents.length === 1) ||
@@ -952,27 +776,29 @@ const Dashboard: React.FC = React.memo(() => {
                       (component.id === "ac" && areaChartToolbarVisible) ||
                       (component.id === "lc" && lineChartToolbarVisible) ||
                       (component.id === "bc" && barChartToolbarVisible) ||
-                      (component.id === "bbc" && brushBarChartToolbarVisible) ||
                       (component.id === "rc" && radarChartToolbarVisible) ||
                       (component.id === "pc" && pieChartToolbarVisible)
                         ? "flex"
                         : "none",
                   }}
                 >
-                  {["ac", "lc", "bc", "bbc", "rc", "pc"].includes(
-                    component.id
-                  ) && (
+                  {["ac", "lc", "bc", "rc", "pc"].includes(component.id) && (
                     <FormControl
                       size="small"
                       sx={{
-                        minWidth: "11rem",
+                        minWidth: "7rem",
                       }}
                     >
-                      <InputLabel aria-invalid id="group">
+                      <InputLabel
+                        sx={{ fontSize: "15px" }}
+                        aria-invalid
+                        id="group"
+                      >
                         Group by
                       </InputLabel>
                       <Select
                         labelId="group"
+                        sx={{ fontSize: "14px" }}
                         value={
                           component.id === "ac"
                             ? areaChartGroupBy
@@ -980,20 +806,19 @@ const Dashboard: React.FC = React.memo(() => {
                             ? lineChartGroupBy
                             : component.id === "bc"
                             ? barChartGroupBy
-                            : component.id === "bbc"
-                            ? brushBarChartGroupBy
                             : component.id === "rc"
                             ? radarChartGroupBy
                             : component.id === "pc"
                             ? pieChartGroupBy
                             : ""
                         }
-                        input={<OutlinedInput label="Group by" />}
+                        input={<OutlinedInput label="Group by-" />}
                       >
                         {groupByOpt.map((opt) => (
                           <MenuItem
                             key={opt}
                             value={opt}
+                            sx={{ fontSize: "14px" }}
                             onClick={() =>
                               handleComponentUpdate(
                                 component.id,
@@ -1004,8 +829,6 @@ const Dashboard: React.FC = React.memo(() => {
                                   ? lineChartSelectedTable
                                   : component.id === "bc"
                                   ? barChartSelectedTable
-                                  : component.id === "bbc"
-                                  ? brushBarChartSelectedTable
                                   : component.id === "rc"
                                   ? radarChartSelectedTable
                                   : component.id === "pc"
@@ -1020,125 +843,6 @@ const Dashboard: React.FC = React.memo(() => {
                         ))}
                       </Select>
                     </FormControl>
-                  )}
-                  {["ac", "lc", "bc", "bbc", "pc"].includes(component.id) && (
-                    <>
-                      <DatePicker
-                        label="Start date"
-                        slotProps={{
-                          textField: { size: "small", error: false },
-                        }}
-                        disableHighlightToday
-                        views={["year", "month", "day"]}
-                        value={
-                          component.id === "ac"
-                            ? dayjs(areaChartFilterStart)
-                            : component.id === "lc"
-                            ? dayjs(lineChartFilterStart)
-                            : component.id === "bc"
-                            ? dayjs(barChartFilterStart)
-                            : component.id === "bbc"
-                            ? dayjs(brushBarChartFilterStart)
-                            : component.id === "pc"
-                            ? dayjs(pieChartFilterStart)
-                            : undefined
-                        }
-                        minDate={
-                          component.id === "ac"
-                            ? dayjs(areaChartMinDate)
-                            : component.id === "lc"
-                            ? dayjs(lineChartMinDate)
-                            : component.id === "bc"
-                            ? dayjs(barChartMinDate)
-                            : component.id === "bbc"
-                            ? dayjs(brushBarChartMinDate)
-                            : component.id === "pc"
-                            ? dayjs(pieChartMinDate)
-                            : ""
-                        }
-                        maxDate={
-                          component.id === "ac"
-                            ? dayjs(areaChartMaxDate)
-                            : component.id === "lc"
-                            ? dayjs(lineChartMaxDate)
-                            : component.id === "bc"
-                            ? dayjs(barChartMaxDate)
-                            : component.id === "bbc"
-                            ? dayjs(brushBarChartMaxDate)
-                            : component.id === "pc"
-                            ? dayjs(pieChartMaxDate)
-                            : ""
-                        }
-                        sx={{
-                          maxWidth: "11rem",
-                        }}
-                        onChange={(startDate) =>
-                          handleComponentUpdate(
-                            component.id,
-                            "filter",
-                            String(startDate) ?? undefined
-                          )
-                        }
-                      ></DatePicker>
-                      <DatePicker
-                        label="End date"
-                        slotProps={{
-                          textField: { size: "small", error: false },
-                        }}
-                        disableHighlightToday
-                        views={["year", "month", "day"]}
-                        value={
-                          component.id === "ac"
-                            ? dayjs(areaChartFilterEnd)
-                            : component.id === "lc"
-                            ? dayjs(lineChartFilterEnd)
-                            : component.id === "bc"
-                            ? dayjs(barChartFilterEnd)
-                            : component.id === "bbc"
-                            ? dayjs(brushBarChartFilterEnd)
-                            : component.id === "pc"
-                            ? dayjs(pieChartFilterEnd)
-                            : ""
-                        }
-                        minDate={
-                          component.id === "ac"
-                            ? dayjs(areaChartMinDate)
-                            : component.id === "lc"
-                            ? dayjs(lineChartMinDate)
-                            : component.id === "bc"
-                            ? dayjs(barChartMinDate)
-                            : component.id === "bbc"
-                            ? dayjs(brushBarChartMinDate)
-                            : component.id === "pc"
-                            ? dayjs(pieChartMinDate)
-                            : ""
-                        }
-                        maxDate={
-                          component.id === "ac"
-                            ? dayjs(areaChartMaxDate)
-                            : component.id === "lc"
-                            ? dayjs(lineChartMaxDate)
-                            : component.id === "bc"
-                            ? dayjs(barChartMaxDate)
-                            : component.id === "bbc"
-                            ? dayjs(brushBarChartMaxDate)
-                            : component.id === "pcc"
-                            ? dayjs(pieChartMaxDate)
-                            : ""
-                        }
-                        sx={{
-                          maxWidth: "11rem",
-                        }}
-                        onChange={(endDate) =>
-                          handleComponentUpdate(
-                            component.id,
-                            "filter",
-                            undefined,
-                            String(endDate) ?? undefined
-                          )
-                        }
-                      ></DatePicker>
-                    </>
                   )}
                 </Box>
               </Box>
@@ -1184,8 +888,6 @@ const Dashboard: React.FC = React.memo(() => {
                               ? lineChartTitle
                               : component?.id === "bc"
                               ? barChartTitle
-                              : component?.id === "bbc"
-                              ? brushBarChartTitle
                               : component?.id === "rc"
                               ? radarChartTitle
                               : component?.id === "pc"
@@ -1224,8 +926,6 @@ const Dashboard: React.FC = React.memo(() => {
                                   ? lineChartSelectedTable
                                   : component?.id === "bc"
                                   ? barChartSelectedTable
-                                  : component?.id === "bbc"
-                                  ? brushBarChartSelectedTable
                                   : component?.id === "rc"
                                   ? radarChartSelectedTable
                                   : component?.id === "pc"
@@ -1246,9 +946,6 @@ const Dashboard: React.FC = React.memo(() => {
                                     includes = table.includes("Bar_");
                                     break;
                                   case "bc":
-                                    includes = table.includes("Bar_");
-                                    break;
-                                  case "bbc":
                                     includes = table.includes("Bar_");
                                     break;
                                   case "rc":
@@ -1291,8 +988,6 @@ const Dashboard: React.FC = React.memo(() => {
                                 : component.id === "lc"
                                 ? "Data must follow a structure: [{date, value 1, value 2}]"
                                 : component.id === "bc"
-                                ? "Data must follow a structure: [{date, value 1, value 2}]"
-                                : component.id === "bbc"
                                 ? "Data must follow a structure: [{date, value 1, value 2}]"
                                 : component.id === "rc"
                                 ? "Data must follow a structure: [{label, value}]"
@@ -1397,35 +1092,6 @@ const Dashboard: React.FC = React.memo(() => {
                               label="Color 2"
                               labelId="barY"
                               color={barChartColorY}
-                              onChange={(color) =>
-                                handleComponentUpdate(
-                                  component.id,
-                                  "color",
-                                  "",
-                                  color
-                                )
-                              }
-                            />
-                          </>
-                        )}
-                        {component.id === "bbc" && (
-                          <>
-                            <ColorPicker
-                              label="Color 1"
-                              labelId="brushX"
-                              color={brushBarChartColorX}
-                              onChange={(color) =>
-                                handleComponentUpdate(
-                                  component.id,
-                                  "color",
-                                  color
-                                )
-                              }
-                            />
-                            <ColorPicker
-                              label="Color 2"
-                              labelId="brushY"
-                              color={brushBarChartColorY}
                               onChange={(color) =>
                                 handleComponentUpdate(
                                   component.id,
