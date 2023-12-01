@@ -101,6 +101,7 @@ export const selectScatterChartFields = createSelector(
         scatterChartData: scatterChart.scatterChartData,
         scatterChartTitle: scatterChart.scatterChartTitle,
         scatterChartColor: scatterChart.scatterChartColor,
+        scatterChartGroupBy: scatterChart.scatterChartGroupBy,
         scatterChartDisplayValues: scatterChart.scatterChartDisplayValues,
         scatterChartToolbarVisible: scatterChart.scatterChartToolbarVisible,
     })

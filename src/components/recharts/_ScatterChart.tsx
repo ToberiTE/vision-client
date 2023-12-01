@@ -25,14 +25,20 @@ const _ScatterChart: React.FC<data> = React.memo(() => {
     scatterChartData,
     scatterChartSelectedTable,
     scatterChartColor,
+    scatterChartGroupBy,
     scatterChartDisplayValues,
   } = useSelector(selectScatterChartFields);
 
   const index = scatterChartData[0] ?? [];
-  const id = Object.keys(index)[0];
-  const date = Object.keys(index)[1];
-  const x = Object.keys(index)[2];
-  const y = Object.keys(index)[3];
+  let date = Object.keys(index)[1];
+  let x = Object.keys(index)[2];
+  let y = Object.keys(index)[3];
+
+  if (scatterChartGroupBy && scatterChartGroupBy !== "None") {
+    date = Object.keys(index)[0];
+    x = Object.keys(index)[1];
+    y = Object.keys(index)[2];
+  }
 
   return (
     <ResponsiveContainer>
@@ -48,7 +54,7 @@ const _ScatterChart: React.FC<data> = React.memo(() => {
           {scatterChartDisplayValues && (
             <LabelList
               style={{ pointerEvents: "none", fontSize: 12 }}
-              dataKey={id}
+              dataKey={date}
               dy={15}
             />
           )}

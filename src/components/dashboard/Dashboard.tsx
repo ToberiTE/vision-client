@@ -42,6 +42,7 @@ import {
   setScatterChartColor,
   setScatterChartData,
   setScatterChartDisplayValues,
+  setScatterChartGroupBy,
   setScatterChartSelectedTable,
   setScatterChartTitle,
   setScatterChartToolbarVisible,
@@ -198,6 +199,7 @@ const Dashboard: React.FC = React.memo(() => {
     scatterChartSelectedTable,
     scatterChartTitle,
     scatterChartColor,
+    scatterChartGroupBy,
     scatterChartDisplayValues,
     scatterChartToolbarVisible,
   } = useSelector(selectScatterChartFields);
@@ -269,6 +271,10 @@ const Dashboard: React.FC = React.memo(() => {
               break;
             case "color":
               dispatch(setScatterChartColor(arg0));
+              break;
+            case "group":
+              fetchSelectedTable(id, arg0, arg1);
+              dispatch(setScatterChartGroupBy(arg1));
               break;
             case "values":
               dispatch(
@@ -782,7 +788,9 @@ const Dashboard: React.FC = React.memo(() => {
                         : "none",
                   }}
                 >
-                  {["ac", "lc", "bc", "rc", "pc"].includes(component.id) && (
+                  {["sc", "ac", "lc", "bc", "rc", "pc"].includes(
+                    component.id
+                  ) && (
                     <FormControl
                       size="small"
                       sx={{
@@ -800,7 +808,9 @@ const Dashboard: React.FC = React.memo(() => {
                         labelId="group"
                         sx={{ fontSize: "14px" }}
                         value={
-                          component.id === "ac"
+                          component.id === "sc"
+                            ? scatterChartGroupBy
+                            : component.id === "ac"
                             ? areaChartGroupBy
                             : component.id === "lc"
                             ? lineChartGroupBy
@@ -823,7 +833,9 @@ const Dashboard: React.FC = React.memo(() => {
                               handleComponentUpdate(
                                 component.id,
                                 "group",
-                                component.id === "ac"
+                                component.id === "sc"
+                                  ? scatterChartSelectedTable
+                                  : component.id === "ac"
                                   ? areaChartSelectedTable
                                   : component.id === "lc"
                                   ? lineChartSelectedTable

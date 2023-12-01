@@ -6,6 +6,7 @@ interface ScatterChartState
     scatterChartSelectedTable: string;
     scatterChartTitle: string,
     scatterChartColor: string,
+    scatterChartGroupBy: string,
     scatterChartDisplayValues: boolean,
     scatterChartToolbarVisible: boolean,
 }
@@ -15,6 +16,7 @@ const initialState: ScatterChartState = {
     scatterChartSelectedTable: "",
     scatterChartTitle: "",
     scatterChartColor: "#A0A0A0",
+    scatterChartGroupBy: "",
     scatterChartDisplayValues: false,
     scatterChartToolbarVisible: true,
 };
@@ -39,6 +41,10 @@ export const _scatterChartSlice = createSlice({
         {
             state.scatterChartColor = action.payload;
         },
+        setScatterChartGroupBy: (state, action: PayloadAction<string>) =>
+        {
+            state.scatterChartGroupBy = action.payload;
+        },
         setScatterChartDisplayValues: (state, action: PayloadAction<boolean>) =>
         {
             state.scatterChartDisplayValues = action.payload;
@@ -50,6 +56,6 @@ export const _scatterChartSlice = createSlice({
     },
 });
 
-export const { setScatterChartData, setScatterChartSelectedTable, setScatterChartTitle, setScatterChartColor, setScatterChartDisplayValues, setScatterChartToolbarVisible } = _scatterChartSlice.actions;
+export const { setScatterChartData, setScatterChartSelectedTable, setScatterChartTitle, setScatterChartColor, setScatterChartGroupBy, setScatterChartDisplayValues, setScatterChartToolbarVisible } = _scatterChartSlice.actions;
 
 export default _scatterChartSlice.reducer;
