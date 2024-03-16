@@ -143,9 +143,11 @@ const _ComposedChart: React.FC<data> = () => {
           <>
             <Line
               name={
-                <span>
-                  Revenue<sub>max</sub>
-                </span>
+                (
+                  <span>
+                    Revenue<sub>max</sub>
+                  </span>
+                ) as any
               }
               dataKey={revenueMax}
               dot={false}
@@ -172,9 +174,11 @@ const _ComposedChart: React.FC<data> = () => {
             />
             <Line
               name={
-                <span>
-                  Revenue<sub>avg</sub>
-                </span>
+                (
+                  <span>
+                    Revenue<sub>avg</sub>
+                  </span>
+                ) as any
               }
               dataKey={revenueAvg}
               dot={false}
@@ -201,9 +205,11 @@ const _ComposedChart: React.FC<data> = () => {
             />
             <Line
               name={
-                <span>
-                  Revenue<sub>min</sub>
-                </span>
+                (
+                  <span>
+                    Revenue<sub>min</sub>
+                  </span>
+                ) as any
               }
               dataKey={revenueMin}
               dot={false}
