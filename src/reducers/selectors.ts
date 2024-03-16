@@ -112,6 +112,7 @@ export const selectComposedChartFields = createSelector(
     (composedChart) => ({
         composedChartSelectedTable: composedChart.composedChartSelectedTable,
         composedChartData: composedChart.composedChartData,
+        activeDataset: composedChart.activeDataset,
         composedChartTitle: composedChart.composedChartTitle,
         composedChartColorX: composedChart.composedChartColorX,
         composedChartColorY: composedChart.composedChartColorY,
@@ -120,5 +121,7 @@ export const selectComposedChartFields = createSelector(
         composedChartGroupBy: composedChart.composedChartGroupBy,
         composedChartDisplayValues: composedChart.composedChartDisplayValues,
         composedChartToolbarVisible: composedChart.composedChartToolbarVisible,
+        forecastPeriod: composedChart.forecastPeriod,
+        isForecastData: composedChart.isForecastData,
     })
 );

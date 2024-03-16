@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import Navbar from "./components/Navbar";
 import Dashboard from "./components/dashboard/Dashboard";
 import Tables from "./components/Tables";
-import Analytics from "./components/Analytics";
+import Analytics from "./components/analytics/Analytics";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";

@@ -218,7 +218,7 @@ const Dashboard: React.FC = React.memo(() => {
     table: string,
     groupBy?: string
   ): Promise<void> => {
-    let url = new URL("/selectedTable", import.meta.env.VITE_BASE_URL);
+    const url = new URL("/selectedTable", import.meta.env.VITE_BASE_URL);
     url.searchParams.append("selectedTable", table);
 
     if (groupBy && groupBy !== "None") {
@@ -287,6 +287,7 @@ const Dashboard: React.FC = React.memo(() => {
               );
           }
           break;
+
         case "ac":
           switch (action) {
             case "table":
@@ -314,6 +315,7 @@ const Dashboard: React.FC = React.memo(() => {
               dispatch(setAreaChartToolbarVisible(!areaChartToolbarVisible));
           }
           break;
+
         case "lc":
           switch (action) {
             case "table":
@@ -341,6 +343,7 @@ const Dashboard: React.FC = React.memo(() => {
               dispatch(setLineChartToolbarVisible(!lineChartToolbarVisible));
           }
           break;
+
         case "bc":
           switch (action) {
             case "table":
@@ -368,6 +371,7 @@ const Dashboard: React.FC = React.memo(() => {
               dispatch(setBarChartToolbarVisible(!barChartToolbarVisible));
           }
           break;
+
         case "rc":
           switch (action) {
             case "table":
@@ -388,6 +392,7 @@ const Dashboard: React.FC = React.memo(() => {
               dispatch(setRadarChartToolbarVisible(!radarChartToolbarVisible));
           }
           break;
+
         case "pc":
           switch (action) {
             case "table":
@@ -416,7 +421,6 @@ const Dashboard: React.FC = React.memo(() => {
             case "toolbar":
               dispatch(setPieChartToolbarVisible(!pieChartToolbarVisible));
           }
-          break;
       }
     }
   };

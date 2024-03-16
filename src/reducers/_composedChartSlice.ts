@@ -3,6 +3,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 interface ComposedChartState
 {
     composedChartData: any[];
+    activeDataset: any[];
     composedChartSelectedTable: string;
     composedChartTitle: string,
     composedChartColorX: string,
@@ -12,10 +13,13 @@ interface ComposedChartState
     composedChartGroupBy: string,
     composedChartDisplayValues: boolean,
     composedChartToolbarVisible: boolean,
+    forecastPeriod: number | undefined,
+    isForecastData: boolean,
 }
 
 const initialState: ComposedChartState = {
     composedChartData: [],
+    activeDataset: [],
     composedChartSelectedTable: "",
     composedChartTitle: "",
     composedChartColorX: "#A0A0A0",
@@ -25,6 +29,8 @@ const initialState: ComposedChartState = {
     composedChartGroupBy: "",
     composedChartDisplayValues: false,
     composedChartToolbarVisible: true,
+    forecastPeriod: undefined,
+    isForecastData: false,
 };
 
 export const _composedChartSlice = createSlice({
@@ -34,6 +40,10 @@ export const _composedChartSlice = createSlice({
         setComposedChartData: (state, action: PayloadAction<any[]>) =>
         {
             state.composedChartData = action.payload;
+        },
+        setActiveDataset: (state, action: PayloadAction<any[]>) =>
+        {
+            state.activeDataset = action.payload;
         },
         setComposedChartSelectedTable: (state, action: PayloadAction<string>) =>
         {
@@ -71,9 +81,17 @@ export const _composedChartSlice = createSlice({
         {
             state.composedChartToolbarVisible = action.payload;
         },
+        setForecastPeriod: (state, action: PayloadAction<number | undefined>) =>
+        {
+            state.forecastPeriod = action.payload;
+        },
+        setIsForecastData: (state, action: PayloadAction<boolean>) =>
+        {
+            state.isForecastData = action.payload;
+        },
     },
 });
 
-export const { setComposedChartData, setComposedChartSelectedTable, setComposedChartTitle, setComposedChartColorX, setComposedChartColorY, setComposedChartColorZ, setComposedChartSorting, setComposedChartGroupBy, setComposedChartDisplayValues, setComposedChartToolbarVisible } = _composedChartSlice.actions;
+export const { setComposedChartData, setActiveDataset, setComposedChartSelectedTable, setComposedChartTitle, setComposedChartColorX, setComposedChartColorY, setComposedChartColorZ, setComposedChartSorting, setComposedChartGroupBy, setComposedChartDisplayValues, setComposedChartToolbarVisible, setForecastPeriod, setIsForecastData } = _composedChartSlice.actions;
 
 export default _composedChartSlice.reducer;

@@ -41,10 +41,10 @@ const sortChartData = (data: any[], sorting: boolean, groupBy: string) => {
   let arrayData = Object.values(data);
 
   arrayData.sort((a: any, b: any) => {
-    let dateA = a.date;
-    let dateB = b.date;
+    let dateA = a.date || a.ds;
+    let dateB = b.date || b.ds;
 
-    if (groupBy === "Week") {
+    if (sorting && groupBy === "Week") {
       let splitA = a.date.split("W");
       let splitB = b.date.split("W");
       dateA = parseInt(splitA[0]) * 100 + parseInt(splitA[1]);

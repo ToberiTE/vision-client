@@ -35,17 +35,11 @@ const Sidenav: React.FC<SidenavProps> = React.memo(
     const [open, setOpen] = useState<boolean>(true);
     const theme = useTheme<Theme>();
 
-    const drawerWidth = 280;
-
     const openedMixin = (theme: Theme): CSSObject => ({
-      width: drawerWidth,
+      width: "280px",
       marginTop: "4rem",
       height: "calc(100% - 4rem)",
       backgroundColor: theme.palette.background.default,
-      transition: theme.transitions.create("width", {
-        easing: theme.transitions.easing.easeOut,
-        duration: theme.transitions.duration.enteringScreen,
-      }),
       overflowX: "hidden",
     });
 
@@ -53,10 +47,6 @@ const Sidenav: React.FC<SidenavProps> = React.memo(
       backgroundColor: theme.palette.background.default,
       marginTop: "4rem",
       height: "calc(100% - 4rem)",
-      transition: theme.transitions.create("width", {
-        easing: theme.transitions.easing.easeOut,
-        duration: theme.transitions.duration.leavingScreen,
-      }),
       width: `calc(${theme.spacing(7)} + 1px)`,
       [theme.breakpoints.up("sm")]: {
         width: `calc(${theme.spacing(8)} + 1px)`,
@@ -67,7 +57,7 @@ const Sidenav: React.FC<SidenavProps> = React.memo(
     const Drawer = styled(MuiDrawer, {
       shouldForwardProp: (prop) => prop !== "open",
     })(({ theme, open }) => ({
-      width: drawerWidth,
+      width: "280px",
       flexShrink: 0,
       boxSizing: "border-box",
       ...(open && {
@@ -105,6 +95,7 @@ const Sidenav: React.FC<SidenavProps> = React.memo(
       const { icon, primary, to, onClick, sidenavTableList } = props;
       return (
         <Button
+          disableTouchRipple
           fullWidth
           size="small"
           tabIndex={-1}

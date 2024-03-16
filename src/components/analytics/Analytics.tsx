@@ -16,12 +16,14 @@ import {
 import {
   selectComposedChartFields,
   selectDashboardFields,
-} from "../reducers/selectors";
+} from "../../reducers/selectors";
 import { AnyAction, Dispatch } from "@reduxjs/toolkit";
 import { useDispatch, useSelector } from "react-redux";
 import InfoIcon from "@mui/icons-material/Info";
 import CloseIcon from "@mui/icons-material/Close";
+import QueryStatsIcon from "@mui/icons-material/QueryStats";
 import SettingsIcon from "@mui/icons-material/Settings";
+import RestoreIcon from "@mui/icons-material/Restore";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
 import { useEffect, useState } from "react";
@@ -36,11 +38,14 @@ import {
   setComposedChartSorting,
   setComposedChartTitle,
   setComposedChartToolbarVisible,
-} from "../reducers/_composedChartSlice";
+  setIsForecastData,
+  setForecastPeriod,
+  setActiveDataset,
+} from "../../reducers/_composedChartSlice";
 import {
   setComponentTables,
   setToggleComponentFullscreen,
-} from "../reducers/dashboardSlice";
+} from "../../reducers/dashboardSlice";
 import {
   ColorPicker,
   Component,
@@ -51,8 +56,8 @@ import {
   SortDescIcon,
   ToggleChartValues,
   groupByOpt,
-} from "./dashboard/DashboardComponents";
-import _ComposedChart from "./recharts/_ComposedChart";
+} from "../dashboard/DashboardComponents";
+import _ComposedChart from "./_ComposedChart";
 import React from "react";
 
 const Analytics: React.FC = React.memo(() => {
@@ -65,6 +70,8 @@ const Analytics: React.FC = React.memo(() => {
 
   const [openComponentSettings, setOpenComponentSettings] =
     useState<string>("");
+
+  const { isForecastData } = useSelector(selectComposedChartFields);
 
   const { toggleComponentFullscreen, componentTables } = useSelector(
     selectDashboardFields
@@ -80,6 +87,9 @@ const Analytics: React.FC = React.memo(() => {
     composedChartGroupBy,
     composedChartToolbarVisible,
     composedChartDisplayValues,
+    forecastPeriod,
+    composedChartData,
+    activeDataset,
   } = useSelector(selectComposedChartFields);
 
   const fetchComponentTables = async (): Promise<void> => {
@@ -108,9 +118,37 @@ const Analytics: React.FC = React.memo(() => {
       switch (id) {
         case "cc":
           dispatch(setComposedChartData(data));
+          dispatch(setActiveDataset(composedChartData));
           break;
       }
     }
+  };
+
+  const fetchForecasts = async (forecastPeriod: number): Promise<void> => {
+    let url = new URL("/selectedTable", import.meta.env.VITE_BASE_URL);
+    url.searchParams.append("selectedTable", "Transaction");
+
+    if (forecastPeriod > 0) {
+      url.searchParams.append("shouldForecast", "true");
+      url.searchParams.append("period", String(forecastPeriod));
+    }
+
+    const response = await fetch(url);
+    const forecastData = await response.json();
+
+    dispatch(setComposedChartData(forecastData));
+    dispatch(setActiveDataset(composedChartData));
+    dispatch(setIsForecastData(true));
+  };
+
+  const handleClearForecast = () => {
+    dispatch(setComposedChartData(activeDataset));
+    dispatch(setActiveDataset([]));
+    dispatch(setIsForecastData(false));
+  };
+
+  const handleForecastInput = (e: number) => {
+    dispatch(setForecastPeriod(e));
   };
 
   const handleComponentUpdate = (
@@ -234,7 +272,7 @@ const Analytics: React.FC = React.memo(() => {
             >
               {/* GRID ROW TOP */}
               <Typography variant="body1">
-                {component.id === "cc" ? composedChartTitle : ""}
+                {composedChartTitle ?? ""}
               </Typography>
 
               {/* ICONS BOX */}
@@ -260,13 +298,13 @@ const Analytics: React.FC = React.memo(() => {
                   ) : null}
 
                   {/* SORT ICONS */}
-                  {component.id === "cc" && composedChartSorting ? (
+                  {composedChartSorting ? (
                     <SortDescIcon
                       onClick={() =>
                         handleComponentUpdate(component.id, "sort")
                       }
                     />
-                  ) : component.id === "cc" && !composedChartSorting ? (
+                  ) : !composedChartSorting ? (
                     <SortAscIcon
                       onClick={() =>
                         handleComponentUpdate(component.id, "sort")
@@ -312,7 +350,7 @@ const Analytics: React.FC = React.memo(() => {
                 </Box>
 
                 {/* TOOLBAR VISIBILITY ICONS */}
-                {component.id === "cc" && composedChartToolbarVisible ? (
+                {composedChartToolbarVisible ? (
                   <ControlsHide
                     onClick={() =>
                       handleComponentUpdate(component.id, "toolbar")
@@ -334,13 +372,47 @@ const Analytics: React.FC = React.memo(() => {
                   gridRow: "1",
                   gridColumn: "3",
                   gap: "1rem",
-                  display:
-                    component.id === "cc" && composedChartToolbarVisible
-                      ? "flex"
-                      : "none",
+                  display: composedChartToolbarVisible ? "flex" : "none",
                 }}
               >
-                {["cc"].includes(component.id) && (
+                <>
+                  <IconButton
+                    title="Clear forecast"
+                    disabled={!isForecastData}
+                    onClick={handleClearForecast}
+                  >
+                    <RestoreIcon />
+                  </IconButton>
+                  <TextField
+                    InputProps={{
+                      style: { fontSize: 14 },
+                      inputProps: { min: 0 },
+                    }}
+                    InputLabelProps={{ style: { fontSize: 14 } }}
+                    sx={{
+                      width: "10rem",
+                    }}
+                    label={"Forecast (days)"}
+                    type="number"
+                    size="small"
+                    disabled={!composedChartData.length}
+                    value={forecastPeriod ?? Number(null)}
+                    onChange={(e) => {
+                      handleForecastInput(Number(e.target.value));
+                    }}
+                  />
+                  <IconButton
+                    title="Forecast"
+                    disabled={
+                      composedChartData.length === 0 ||
+                      (composedChartData.length > 0 &&
+                        (Number(forecastPeriod) <= 0 ||
+                          isNaN(Number(forecastPeriod))))
+                    }
+                    onClick={() => fetchForecasts(Number(forecastPeriod))}
+                  >
+                    <QueryStatsIcon />
+                  </IconButton>
                   <FormControl
                     size="small"
                     sx={{
@@ -357,7 +429,7 @@ const Analytics: React.FC = React.memo(() => {
                     <Select
                       labelId="group"
                       sx={{ fontSize: "14px" }}
-                      value={component.id === "cc" ? composedChartGroupBy : ""}
+                      value={composedChartGroupBy ?? ""}
                       input={<OutlinedInput label="Group by-" />}
                     >
                       {groupByOpt.map((opt) => (
@@ -381,7 +453,7 @@ const Analytics: React.FC = React.memo(() => {
                       ))}
                     </Select>
                   </FormControl>
-                )}
+                </>
               </Box>
             </Box>
 
@@ -417,7 +489,7 @@ const Analytics: React.FC = React.memo(() => {
                       <TextField
                         label="Title"
                         spellCheck="false"
-                        value={component?.id === "cc" ? composedChartTitle : ""}
+                        value={composedChartTitle ?? ""}
                         onChange={(e) =>
                           handleComponentUpdate(
                             component.id,
@@ -441,11 +513,7 @@ const Analytics: React.FC = React.memo(() => {
                           <Select
                             labelId="data"
                             input={<OutlinedInput label="Data" />}
-                            value={
-                              component?.id === "cc"
-                                ? composedChartSelectedTable
-                                : ""
-                            }
+                            value={composedChartSelectedTable ?? ""}
                           >
                             {componentTables.map((table) => {
                               let includes;
@@ -480,9 +548,8 @@ const Analytics: React.FC = React.memo(() => {
                         </FormControl>
                         <Tooltip
                           title={
-                            component.id === "cc"
-                              ? "Data must follow a structure: [{date, value 1, value 2, value 3}]"
-                              : null
+                            "Data must follow a structure: [{date, value 1, value 2, value 3}]" ??
+                            null
                           }
                           placement="top"
                         >
@@ -492,49 +559,43 @@ const Analytics: React.FC = React.memo(() => {
                         </Tooltip>
                       </FlexBetween>
 
-                      {component.id === "cc" && (
-                        <>
-                          <ColorPicker
-                            label="Color 1"
-                            labelId="composedX"
-                            color={composedChartColorX}
-                            onChange={(color) =>
-                              handleComponentUpdate(
-                                component.id,
-                                "color",
-                                color
-                              )
-                            }
-                          />
-                          <ColorPicker
-                            label="Color 2"
-                            labelId="composedY"
-                            color={composedChartColorY}
-                            onChange={(color) =>
-                              handleComponentUpdate(
-                                component.id,
-                                "color",
-                                "",
-                                color
-                              )
-                            }
-                          />
-                          <ColorPicker
-                            label="Color 2"
-                            labelId="composedZ"
-                            color={composedChartColorZ}
-                            onChange={(color) =>
-                              handleComponentUpdate(
-                                component.id,
-                                "color",
-                                "",
-                                "",
-                                color
-                              )
-                            }
-                          />
-                        </>
-                      )}
+                      <>
+                        <ColorPicker
+                          label="Color 1"
+                          labelId="composedX"
+                          color={composedChartColorX}
+                          onChange={(color) =>
+                            handleComponentUpdate(component.id, "color", color)
+                          }
+                        />
+                        <ColorPicker
+                          label="Color 2"
+                          labelId="composedY"
+                          color={composedChartColorY}
+                          onChange={(color) =>
+                            handleComponentUpdate(
+                              component.id,
+                              "color",
+                              "",
+                              color
+                            )
+                          }
+                        />
+                        <ColorPicker
+                          label="Color 3"
+                          labelId="composedZ"
+                          color={composedChartColorZ}
+                          onChange={(color) =>
+                            handleComponentUpdate(
+                              component.id,
+                              "color",
+                              "",
+                              "",
+                              color
+                            )
+                          }
+                        />
+                      </>
                     </Box>
                   </DialogContent>
                 </Box>

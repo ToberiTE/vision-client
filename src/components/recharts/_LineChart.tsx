@@ -109,8 +109,6 @@ const _LineChart: React.FC<data> = React.memo(() => {
               <CustomLabel
                 textAnchor="middle"
                 value={x}
-                x={x}
-                y={y}
                 fill={theme.palette.text.primary}
                 opacity={memoizedOpacity[y]}
                 writingMode={data.length > 20 ? "vertical-rl" : "horizontal"}
@@ -130,8 +128,6 @@ const _LineChart: React.FC<data> = React.memo(() => {
               <CustomLabel
                 textAnchor="middle"
                 value={x}
-                x={x}
-                y={y}
                 fill={theme.palette.text.primary}
                 opacity={memoizedOpacity[x]}
                 writingMode={data.length > 20 ? "vertical-rl" : "horizontal"}
