@@ -44,7 +44,6 @@ const _ComposedChart: React.FC<data> = () => {
   let expenses: string = "";
   let net_income: string = "";
 
-  // if isForecastData switch the data around.
   if (isForecastData) {
     date = Object.keys(index)[0];
     revenueAvg = Object.keys(index)[1];
