@@ -124,13 +124,21 @@ const Analytics: React.FC = React.memo(() => {
     }
   };
 
-  const fetchForecasts = async (forecastPeriod: number): Promise<void> => {
+  const fetchForecasts = async (
+    forecastPeriod?: number,
+    groupForecast?: string
+  ): Promise<void> => {
     let url = new URL("/selectedTable", import.meta.env.VITE_BASE_URL);
+
     url.searchParams.append("selectedTable", "Transaction");
 
-    if (forecastPeriod > 0) {
+    if (forecastPeriod && forecastPeriod > 0) {
       url.searchParams.append("shouldForecast", "true");
       url.searchParams.append("period", String(forecastPeriod));
+    }
+
+    if (groupForecast && groupForecast !== "None") {
+      url.searchParams.append("groupForecast", groupForecast);
     }
 
     const response = await fetch(url);
@@ -438,14 +446,16 @@ const Analytics: React.FC = React.memo(() => {
                           value={opt}
                           sx={{ fontSize: "14px" }}
                           onClick={() =>
-                            handleComponentUpdate(
-                              component.id,
-                              "group",
-                              component.id === "cc"
-                                ? composedChartSelectedTable
-                                : "",
-                              opt
-                            )
+                            isForecastData
+                              ? fetchForecasts(undefined, opt)
+                              : handleComponentUpdate(
+                                  component.id,
+                                  "group",
+                                  component.id === "cc"
+                                    ? composedChartSelectedTable
+                                    : "",
+                                  opt
+                                )
                           }
                         >
                           {opt}

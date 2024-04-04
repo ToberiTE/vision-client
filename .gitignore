@@ -11,6 +11,10 @@ node_modules
 dist
 dist-ssr
 *.local
+[Dd]ebug/
+[Rr]elease/
+x64
+x86
 
 # Editor directories and files
 .vscode/*

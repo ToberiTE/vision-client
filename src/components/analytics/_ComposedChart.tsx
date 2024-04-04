@@ -56,7 +56,11 @@ const _ComposedChart: React.FC<data> = () => {
     net_income = Object.keys(index)[4];
   }
 
-  if (composedChartGroupBy && composedChartGroupBy !== "None") {
+  if (
+    composedChartGroupBy &&
+    composedChartGroupBy !== "None" &&
+    !isForecastData
+  ) {
     date = Object.keys(index)[0];
     revenue = Object.keys(index)[1];
     expenses = Object.keys(index)[2];
