@@ -66,7 +66,7 @@ const Login: React.FC = () => {
           }}
         >
           <Typography fontWeight="1" variant="h2">
-            Vision&trade;
+            Vision
           </Typography>
           <Button
             color="info"

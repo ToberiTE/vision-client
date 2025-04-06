@@ -11,16 +11,19 @@ import {
 } from "recharts";
 import { useSelector } from "react-redux";
 import { useTheme } from "@mui/material";
-import { useMemo, useState } from "react";
-import { CustomLabel, sortChartData } from "./utils";
-import React from "react";
+import {
+  FC,
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { CustomLabel, Data, sortChartData } from "./utils";
 import { selectBarChartFields } from "../../reducers/selectors";
 
-interface data {
-  [key: string]: any[];
-}
-
-const _BarChart: React.FC<data> = React.memo(() => {
+const _BarChart: FC<Data> = memo(() => {
   const theme = useTheme();
 
   const {
@@ -54,23 +57,32 @@ const _BarChart: React.FC<data> = React.memo(() => {
     return opacity;
   }, [opacity]);
 
-  const handleMouseEnter = (o: any) => {
-    const { dataKey } = o;
+  const barLegendRef = useRef<any>(undefined);
 
+  const handleClick = useCallback((o: any) => {
+    const { dataKey } = o;
     setOpacity({
       ...memoizedOpacity,
-      [dataKey]: 0,
+      [dataKey]: 0.1,
     });
-  };
+  }, []);
 
-  const handleMouseLeave = (o: any) => {
-    const { dataKey } = o;
+  const handleOutsideClick = useCallback((o: any) => {
+    if (barLegendRef.current) {
+      const { dataKey } = o;
+      setOpacity({
+        ...memoizedOpacity,
+        [dataKey]: 1,
+      });
+    }
+  }, []);
 
-    setOpacity({
-      ...memoizedOpacity,
-      [dataKey]: 0.8,
-    });
-  };
+  useEffect(() => {
+    document.addEventListener("mouseup", handleOutsideClick);
+    return () => {
+      document.removeEventListener("mouseup", handleOutsideClick);
+    };
+  }, [handleOutsideClick]);
 
   let showLabelX: boolean = true;
   let showLabelY: boolean = true;
@@ -102,10 +114,7 @@ const _BarChart: React.FC<data> = React.memo(() => {
             backgroundColor: theme.palette.background.paper,
           }}
         />
-        <Legend
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-        />
+        <Legend onClick={handleClick} ref={barLegendRef} />
         <Bar
           dataKey={x}
           fill={barChartColorX}

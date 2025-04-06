@@ -11,16 +11,19 @@ import {
 } from "recharts";
 import { useSelector } from "react-redux";
 import { useTheme } from "@mui/material";
-import { useCallback, useMemo, useState } from "react";
-import React from "react";
+import {
+  FC,
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { selectComposedChartFields } from "../../reducers/selectors";
-import { CustomLabel, sortChartData } from "../recharts/utils";
+import { CustomLabel, Data, sortChartData } from "../recharts/utils";
 
-interface data {
-  [key: string]: any[];
-}
-
-const _ComposedChart: React.FC<data> = () => {
+const _ComposedChart: FC<Data> = memo(() => {
   const theme = useTheme();
   const {
     composedChartData,
@@ -80,27 +83,32 @@ const _ComposedChart: React.FC<data> = () => {
     return opacity;
   }, [opacity]);
 
-  const handleMouseEnter = useCallback(
-    (o: any) => {
-      const { dataKey } = o;
-      setOpacity({
-        ...memoizedOpacity,
-        [dataKey]: 0,
-      });
-    },
-    [memoizedOpacity]
-  );
+  const composedLegendRef = useRef<any>(undefined);
 
-  const handleMouseLeave = useCallback(
-    (o: any) => {
+  const handleClick = useCallback((o: any) => {
+    const { dataKey } = o;
+    setOpacity({
+      ...memoizedOpacity,
+      [dataKey]: 0.1,
+    });
+  }, []);
+
+  const handleOutsideClick = useCallback((o: any) => {
+    if (composedLegendRef.current) {
       const { dataKey } = o;
       setOpacity({
         ...memoizedOpacity,
-        [dataKey]: 0.8,
+        [dataKey]: 1,
       });
-    },
-    [memoizedOpacity]
-  );
+    }
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener("mouseup", handleOutsideClick);
+    return () => {
+      document.removeEventListener("mouseup", handleOutsideClick);
+    };
+  }, [handleOutsideClick]);
 
   let showLabelRevenue: boolean = true;
   let showLabelExpenses: boolean = true;
@@ -156,7 +164,7 @@ const _ComposedChart: React.FC<data> = () => {
               dataKey={revenueMax}
               dot={false}
               stroke={composedChartColorX}
-              strokeOpacity={
+              opacity={
                 memoizedOpacity[revenueAvg] && memoizedOpacity[revenueMin]
               }
               label={
@@ -187,7 +195,7 @@ const _ComposedChart: React.FC<data> = () => {
               dataKey={revenueAvg}
               dot={false}
               stroke={composedChartColorY}
-              strokeOpacity={
+              opacity={
                 memoizedOpacity[revenueMax] && memoizedOpacity[revenueMin]
               }
               label={
@@ -218,7 +226,7 @@ const _ComposedChart: React.FC<data> = () => {
               dataKey={revenueMin}
               dot={false}
               stroke={composedChartColorZ}
-              strokeOpacity={
+              opacity={
                 memoizedOpacity[revenueMax] && memoizedOpacity[revenueAvg]
               }
               label={
@@ -240,11 +248,9 @@ const _ComposedChart: React.FC<data> = () => {
             />
           </>
         )}
-
         {!isForecastData && (
           <>
             <Line
-              name={net_income}
               type="monotone"
               dot={false}
               dataKey={net_income}
@@ -270,7 +276,6 @@ const _ComposedChart: React.FC<data> = () => {
               }
             />
             <Line
-              name={expenses}
               type="monotone"
               dot={false}
               dataKey={expenses}
@@ -327,13 +332,10 @@ const _ComposedChart: React.FC<data> = () => {
           stroke={theme.palette.primary.main}
           height={15}
         />
-        <Legend
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-        />
+        <Legend onClick={handleClick} ref={composedLegendRef} />
       </ComposedChart>
     </ResponsiveContainer>
   );
-};
+});
 
 export default _ComposedChart;

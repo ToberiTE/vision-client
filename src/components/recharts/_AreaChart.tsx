@@ -11,15 +11,12 @@ import {
 } from "recharts";
 import { useSelector } from "react-redux";
 import { useTheme } from "@mui/material";
-import { useCallback, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import React from "react";
 import { selectAreaChartFields } from "../../reducers/selectors";
-import { CustomLabel, sortChartData } from "./utils";
-interface data {
-  [key: string]: any[];
-}
+import { CustomLabel, Data, sortChartData } from "./utils";
 
-const _AreaChart: React.FC<data> = React.memo(() => {
+const _AreaChart: React.FC<Data> = memo(() => {
   const theme = useTheme();
 
   const {
@@ -53,27 +50,32 @@ const _AreaChart: React.FC<data> = React.memo(() => {
     return opacity;
   }, [opacity]);
 
-  const handleMouseEnter = useCallback(
-    (o: any) => {
-      const { dataKey } = o;
-      setOpacity({
-        ...memoizedOpacity,
-        [dataKey]: 0,
-      });
-    },
-    [memoizedOpacity]
-  );
+  const areaLegendRef = useRef<any>(undefined);
 
-  const handleMouseLeave = useCallback(
-    (o: any) => {
+  const handleClick = useCallback((o: any) => {
+    const { dataKey } = o;
+    setOpacity({
+      ...memoizedOpacity,
+      [dataKey]: 0.1,
+    });
+  }, []);
+
+  const handleOutsideClick = useCallback((o: any) => {
+    if (areaLegendRef.current) {
       const { dataKey } = o;
       setOpacity({
         ...memoizedOpacity,
-        [dataKey]: 0.8,
+        [dataKey]: 1,
       });
-    },
-    [memoizedOpacity]
-  );
+    }
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener("mouseup", handleOutsideClick);
+    return () => {
+      document.removeEventListener("mouseup", handleOutsideClick);
+    };
+  }, [handleOutsideClick]);
 
   let showLabelX: boolean = true;
   let showLabelY: boolean = true;
@@ -152,10 +154,7 @@ const _AreaChart: React.FC<data> = React.memo(() => {
           stroke={theme.palette.primary.main}
           height={15}
         />
-        <Legend
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-        />
+        <Legend onClick={handleClick} ref={areaLegendRef} />
       </AreaChart>
     </ResponsiveContainer>
   );

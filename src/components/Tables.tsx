@@ -3,7 +3,7 @@ import TransactionReactQueryProvider from "./tables/TransactionTable";
 import ProjectTable from "./tables/ProjectTable";
 import React from "react";
 
-const Tables: React.FC = React.memo(() => {
+const Tables: React.FC = () => {
   const theme = useTheme();
 
   return (
@@ -21,6 +21,6 @@ const Tables: React.FC = React.memo(() => {
       </Box>
     </Box>
   );
-});
+};
 
 export default Tables;

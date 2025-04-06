@@ -11,16 +11,12 @@ import {
 } from "recharts";
 import { useSelector } from "react-redux";
 import { useTheme } from "@mui/material";
-import { useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import React from "react";
-import { CustomLabel, sortChartData } from "./utils";
+import { CustomLabel, Data, sortChartData } from "./utils";
 import { selectLineChartFields } from "../../reducers/selectors";
 
-interface data {
-  [key: string]: any[];
-}
-
-const _LineChart: React.FC<data> = React.memo(() => {
+const _LineChart: React.FC<Data> = memo(() => {
   const theme = useTheme();
 
   const {
@@ -54,23 +50,32 @@ const _LineChart: React.FC<data> = React.memo(() => {
     return opacity;
   }, [opacity]);
 
-  const handleMouseEnter = (o: any) => {
-    const { dataKey } = o;
+  const lineLegendRef = useRef<any>(undefined);
 
+  const handleClick = useCallback((o: any) => {
+    const { dataKey } = o;
     setOpacity({
       ...memoizedOpacity,
-      [dataKey]: 0,
+      [dataKey]: 0.1,
     });
-  };
+  }, []);
 
-  const handleMouseLeave = (o: any) => {
-    const { dataKey } = o;
+  const handleOutsideClick = useCallback((o: any) => {
+    if (lineLegendRef.current) {
+      const { dataKey } = o;
+      setOpacity({
+        ...memoizedOpacity,
+        [dataKey]: 1,
+      });
+    }
+  }, []);
 
-    setOpacity({
-      ...memoizedOpacity,
-      [dataKey]: 0.8,
-    });
-  };
+  useEffect(() => {
+    document.addEventListener("mouseup", handleOutsideClick);
+    return () => {
+      document.removeEventListener("mouseup", handleOutsideClick);
+    };
+  }, [handleOutsideClick]);
 
   let showLabelX: boolean = true;
   let showLabelY: boolean = true;
@@ -140,10 +145,7 @@ const _LineChart: React.FC<data> = React.memo(() => {
           fill={theme.palette.background.default}
           height={15}
         />
-        <Legend
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-        />
+        <Legend onClick={handleClick} ref={lineLegendRef} />
         <Tooltip
           contentStyle={{
             backgroundColor: theme.palette.background.paper,

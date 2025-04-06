@@ -1,4 +1,4 @@
-import React from "react";
+import { JSX, memo } from "react";
 
 interface LabelProps {
   value?: string;
@@ -10,7 +10,11 @@ interface LabelProps {
   writingMode?: string;
 }
 
-const CustomLabel = React.memo(
+export interface Data {
+  [key: string]: any[];
+}
+
+const CustomLabel = memo(
   ({
     value,
     fill,

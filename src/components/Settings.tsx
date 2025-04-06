@@ -7,8 +7,9 @@ import {
   useTheme,
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
+import { memo } from "react";
 
-const Settings: React.FC = () => {
+const Settings: React.FC = memo(() => {
   const theme = useTheme();
 
   return (
@@ -61,6 +62,6 @@ const Settings: React.FC = () => {
       </Box>
     </Box>
   );
-};
+});
 
 export default Settings;

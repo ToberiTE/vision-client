@@ -95,6 +95,7 @@ function App(_Props: { toggleColorMode: void }) {
     () => createTheme(getDesignTokens(mode as PaletteMode)),
     [mode]
   );
+
   return (
     <>
       <AuthenticatedTemplate>

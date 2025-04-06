@@ -8,14 +8,11 @@ import {
   RadarChart,
 } from "recharts";
 import { useSelector } from "react-redux";
-import React from "react";
 import { selectRadarChartFields } from "../../reducers/selectors";
+import { FC, memo } from "react";
+import { Data } from "./utils";
 
-interface data {
-  [key: string]: any[];
-}
-
-const _RadarChart: React.FC<data> = React.memo(() => {
+const _RadarChart: FC<Data> = memo(() => {
   const { radarChartData, radarChartSelectedTable, radarChartColor } =
     useSelector(selectRadarChartFields);
 

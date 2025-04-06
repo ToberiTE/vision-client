@@ -10,7 +10,7 @@ import {
   debounce,
   SxProps,
 } from "@mui/material";
-import React from "react";
+import { JSX, memo } from "react";
 import SortIcon from "@mui/icons-material/Sort";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -78,7 +78,7 @@ const components: Component[] = [
   },
 ];
 
-const SortDescIcon = React.memo(({ onClick }: IconProps): JSX.Element => {
+const SortDescIcon = memo(({ onClick }: IconProps): JSX.Element => {
   return (
     <IconButton
       title={"Sort by date: Descending"}
@@ -93,7 +93,7 @@ const SortDescIcon = React.memo(({ onClick }: IconProps): JSX.Element => {
   );
 });
 
-const SortAscIcon = React.memo(({ onClick }: IconProps): JSX.Element => {
+const SortAscIcon = memo(({ onClick }: IconProps): JSX.Element => {
   return (
     <IconButton
       title={"Sort by date: Ascending"}
@@ -108,7 +108,7 @@ const SortAscIcon = React.memo(({ onClick }: IconProps): JSX.Element => {
   );
 });
 
-const ColorPicker = React.memo(
+const ColorPicker = memo(
   ({ color, onChange, label, labelId }: ColorPickerProps): JSX.Element => {
     return (
       <FormControl>
@@ -154,22 +154,20 @@ const ColorPicker = React.memo(
   }
 );
 
-const FlexBetween = React.memo(
-  ({ sx, children }: FlexBetweenProps): JSX.Element => {
-    return (
-      <Box
-        sx={sx}
-        display="flex"
-        alignItems="center"
-        justifyContent="space-between"
-      >
-        {children}
-      </Box>
-    );
-  }
-);
+const FlexBetween = memo(({ sx, children }: FlexBetweenProps): JSX.Element => {
+  return (
+    <Box
+      sx={sx}
+      display="flex"
+      alignItems="center"
+      justifyContent="space-between"
+    >
+      {children}
+    </Box>
+  );
+});
 
-const ControlsHide = React.memo(({ onClick }: IconProps): JSX.Element => {
+const ControlsHide = memo(({ onClick }: IconProps): JSX.Element => {
   return (
     <IconButton title={"Hide controls"} onClick={onClick}>
       <VisibilityOffIcon />
@@ -177,7 +175,7 @@ const ControlsHide = React.memo(({ onClick }: IconProps): JSX.Element => {
   );
 });
 
-const ControlsShow = React.memo(({ onClick }: IconProps): JSX.Element => {
+const ControlsShow = memo(({ onClick }: IconProps): JSX.Element => {
   return (
     <IconButton title={"Show controls"} onClick={onClick}>
       <VisibilityIcon style={{ opacity: "0.25" }} />
@@ -185,7 +183,7 @@ const ControlsShow = React.memo(({ onClick }: IconProps): JSX.Element => {
   );
 });
 
-const ToggleChartValues = React.memo(({ onClick }: IconProps): JSX.Element => {
+const ToggleChartValues = memo(({ onClick }: IconProps): JSX.Element => {
   return (
     <IconButton title={"Toggle chart values"} onClick={onClick}>
       <ValuesIcon />

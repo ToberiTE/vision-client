@@ -47,7 +47,7 @@ const Navbar: React.FC = () => {
             }}
           />
         </Link>
-        <Typography variant="h5">Vision&trade;</Typography>
+        <Typography variant="h5">Vision</Typography>
       </Box>
       <Box display="flex" alignItems="center" gap={0.5}>
         <Box display="flex" alignItems="center" gap={1} mr={1}>

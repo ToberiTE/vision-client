@@ -146,7 +146,7 @@ const ProjectTable = () => {
       const response = await fetch(url.href);
       return await response.json();
     },
-    keepPreviousData: true,
+    staleTime: Infinity,
   });
 
   const statusArray = Object.values(Status).filter(
@@ -300,10 +300,9 @@ const ProjectTable = () => {
                 </Tooltip>
               </Box>
             )}
-            editingMode="row"
+            enableEditing
             enableColumnResizing
             enableFilterMatchHighlighting
-            enableEditing
             columns={columns}
             data={data ?? []}
             initialState={{ showColumnFilters: true }}

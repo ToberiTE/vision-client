@@ -17,7 +17,7 @@ import {
   selectComposedChartFields,
   selectDashboardFields,
 } from "../../reducers/selectors";
-import { AnyAction, Dispatch } from "@reduxjs/toolkit";
+import { Action, Dispatch } from "@reduxjs/toolkit";
 import { useDispatch, useSelector } from "react-redux";
 import InfoIcon from "@mui/icons-material/Info";
 import CloseIcon from "@mui/icons-material/Close";
@@ -26,7 +26,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import RestoreIcon from "@mui/icons-material/Restore";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
-import { useEffect, useState } from "react";
+import { FC, memo, useEffect, useState } from "react";
 import {
   setComposedChartColorX,
   setComposedChartColorY,
@@ -58,11 +58,10 @@ import {
   groupByOpt,
 } from "../dashboard/DashboardComponents";
 import _ComposedChart from "./_ComposedChart";
-import React from "react";
 
-const Analytics: React.FC = React.memo(() => {
+const Analytics: FC = memo(() => {
   const theme = useTheme();
-  const dispatch = useDispatch<Dispatch<AnyAction>>();
+  const dispatch = useDispatch<Dispatch<Action>>();
 
   useEffect(() => {
     fetchComponentTables();
@@ -392,11 +391,13 @@ const Analytics: React.FC = React.memo(() => {
                     <RestoreIcon />
                   </IconButton>
                   <TextField
-                    InputProps={{
-                      style: { fontSize: 14 },
-                      inputProps: { min: 0 },
+                    slotProps={{
+                      input: {
+                        style: { fontSize: 14 },
+                        inputProps: { min: 0 },
+                      },
+                      inputLabel: { style: { fontSize: 14 } },
                     }}
-                    InputLabelProps={{ style: { fontSize: 14 } }}
                     sx={{
                       width: "10rem",
                     }}
@@ -558,8 +559,7 @@ const Analytics: React.FC = React.memo(() => {
                         </FormControl>
                         <Tooltip
                           title={
-                            "Data must follow a structure: [{date, value 1, value 2, value 3}]" ??
-                            null
+                            "Data must follow a structure: [{date, value 1, value 2, value 3}]"
                           }
                           placement="top"
                         >

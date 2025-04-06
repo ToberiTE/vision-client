@@ -11,14 +11,11 @@ import {
 } from "recharts";
 import { useSelector } from "react-redux";
 import { Box, useTheme } from "@mui/material";
-import React from "react";
 import { selectScatterChartFields } from "../../reducers/selectors";
+import { FC, memo } from "react";
+import { Data } from "./utils";
 
-interface data {
-  [key: string]: any[];
-}
-
-const _ScatterChart: React.FC<data> = React.memo(() => {
+const _ScatterChart: FC<Data> = memo(() => {
   const theme = useTheme();
 
   const {

@@ -5,23 +5,25 @@ import {
   Legend,
   Cell,
   Tooltip,
-  Brush,
 } from "recharts";
 import { useSelector } from "react-redux";
-import { useCallback, useMemo, useState } from "react";
+import {
+  FC,
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useTheme } from "@mui/material";
-import React from "react";
 import {
   selectDashboardFields,
   selectPieChartFields,
 } from "../../reducers/selectors";
-import { sortChartData } from "./utils";
+import { Data, sortChartData } from "./utils";
 
-interface data {
-  [key: string]: any[];
-}
-
-const _PieChart: React.FC<data> = React.memo(() => {
+const _PieChart: FC<Data> = memo(() => {
   const theme = useTheme();
 
   const { dashboardLayout, selectedComponentIds, toggleComponentFullscreen } =
@@ -37,8 +39,7 @@ const _PieChart: React.FC<data> = React.memo(() => {
   } = useSelector(selectPieChartFields);
 
   const [data, setData] = useState(pieChartData);
-  const [hoverIndex, setHoverIndex] = useState<any>(null);
-  const [shouldAnimate, setShouldAnimate] = useState<boolean>(false);
+  const [hoverIndices, setHoverIndices] = useState<number[]>([]);
 
   const index = pieChartData[0] ?? [];
   let date = Object.keys(index)[1];
@@ -49,27 +50,29 @@ const _PieChart: React.FC<data> = React.memo(() => {
     val = Object.keys(index)[1];
   }
 
-  let dataToMap;
-  data.length > 0 ? (dataToMap = data) : pieChartData;
+  const dataToMap = data.length > 0 ? data : pieChartData;
 
-  let legendLayout: boolean = data.length > 30 ? true : false;
+  const legendLayout = data.length > 30;
 
-  const legendStyle = {
-    height: "80%",
-    overflow: "auto",
-    width: "fit-content",
-    paddingRight:
-      dashboardLayout === 1 && selectedComponentIds.length > 1 ? "0" : "2rem",
-    marginRight:
-      dashboardLayout === 0 ||
-      toggleComponentFullscreen === "pc" ||
-      (dashboardLayout === 1 && selectedComponentIds.length < 2)
-        ? "5%"
-        : 0,
-  };
+  const legendStyle = useMemo(() => {
+    return {
+      height: "80%",
+      overflow: "auto",
+      width: "fit-content",
+      cursor: "pointer",
+      paddingRight:
+        dashboardLayout === 1 && selectedComponentIds.length > 1 ? "0" : "2rem",
+      marginRight:
+        dashboardLayout === 0 ||
+        toggleComponentFullscreen === "pc" ||
+        (dashboardLayout === 1 && selectedComponentIds.length < 2)
+          ? "5%"
+          : 0,
+    };
+  }, [dashboardLayout, legendLayout]);
 
   useMemo(() => {
-    let sortedData = sortChartData(
+    const sortedData = sortChartData(
       pieChartData,
       pieChartSorting,
       pieChartGroupBy
@@ -82,7 +85,6 @@ const _PieChart: React.FC<data> = React.memo(() => {
     const hslaString = pieChartColor.match(
       /hsla\((\d+), (\d+)%, (\d+)%, (\d+)/
     ) ?? [pieChartColor];
-
     const [_, h, s, l, a] = hslaString.map((v) => parseInt(v));
     const numShades = pieChartData.length;
 
@@ -92,38 +94,96 @@ const _PieChart: React.FC<data> = React.memo(() => {
       shades.push(shadeColor);
     }
     return shades;
-  }, [
-    pieChartData,
-    pieChartColor,
-    pieChartLMin,
-    pieChartLMax,
-    pieChartSorting,
-    pieChartGroupBy,
-  ]);
+  }, [dataToMap, pieChartColor, pieChartLMin, pieChartLMax]);
 
-  const handleMouseEnter = useCallback((_: any, i: any) => {
-    setShouldAnimate(false);
-    setHoverIndex(i + 1);
+  const cellStyles = useMemo(() => {
+    return dataToMap?.map((_, i) => ({
+      opacity:
+        hoverIndices.length === 0 || hoverIndices.includes(i) ? "1" : "0.1",
+      transition: "opacity 150ms linear",
+    }));
+  }, [hoverIndices, dataToMap]);
+
+  const legendPayload = useMemo(() => {
+    return dataToMap?.map((_, i) => ({
+      color: hoverIndices.includes(i)
+        ? theme.palette.text.primary
+        : cellColors[i],
+      value: _[date],
+    }));
+  }, [dataToMap, cellColors, date, hoverIndices]);
+
+  const pieLegendRef = useRef<any>(undefined);
+
+  const handleClick = useCallback((_: any, i: number, e: React.MouseEvent) => {
+    setHoverIndices((prev) => {
+      if (e.shiftKey) {
+        return prev.includes(i) ? prev.filter((p) => p !== i) : [...prev, i];
+      } else {
+        return [i];
+      }
+    });
   }, []);
 
-  const handleMouseLeave = useCallback(() => {
-    setHoverIndex(null);
+  const handleOutsideClick = useCallback((e: MouseEvent) => {
+    if (
+      pieLegendRef.current &&
+      !pieLegendRef.current.contains(e.target as Node)
+    ) {
+      setHoverIndices([]);
+    }
   }, []);
 
-  useMemo(() => {
-    setShouldAnimate(true);
-  }, [pieChartData]);
+  useEffect(() => {
+    document.addEventListener("mouseup", handleOutsideClick);
+    return () => {
+      document.removeEventListener("mouseup", handleOutsideClick);
+    };
+  }, [handleOutsideClick]);
+
+  const isLargeData = dataToMap?.length > 100;
+
+  const CustomLegend = useMemo(
+    () => (props: any) => {
+      const { payload } = props;
+      return (
+        <div ref={pieLegendRef} style={{ padding: "10px" }}>
+          {payload.map((e: any, i: number) => (
+            <div
+              key={`item-${i}`}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginBottom: "5px",
+                cursor: "pointer",
+                userSelect: "none",
+              }}
+              onClick={(ev) => handleClick(e, i, ev)}
+            >
+              <div
+                style={{
+                  width: "12px",
+                  height: "12px",
+                  borderRadius: 100,
+                  backgroundColor: e.color,
+                  marginRight: "8px",
+                }}
+              />
+              <span>{e.value}</span>
+            </div>
+          ))}
+        </div>
+      );
+    },
+    []
+  );
 
   return (
     <ResponsiveContainer>
-      <PieChart>
-        <Brush
-          dataKey={date}
-          fill={theme.palette.background.paper}
-          height={15}
-        />
+      <PieChart style={{ userSelect: "none" }}>
         <Pie
-          isAnimationActive={shouldAnimate}
+          onMouseEnter={() => setHoverIndices([])}
+          isAnimationActive={!isLargeData && !handleClick}
           blendStroke
           dataKey={val ?? []}
           data={data.length > 0 ? data : pieChartData}
@@ -132,35 +192,17 @@ const _PieChart: React.FC<data> = React.memo(() => {
           }
         >
           {dataToMap?.map((_, i) => (
-            <Cell
-              stroke="#ccc"
-              key={i}
-              fill={cellColors[i]}
-              style={{
-                fontSize: "15px",
-                fontWeight: "light",
-                opacity: !hoverIndex
-                  ? "1"
-                  : "0.1" && i === hoverIndex - 1
-                  ? "1"
-                  : "0.1",
-                transition: "opacity 250ms ease-in-out",
-              }}
-            />
+            <Cell key={i} fill={cellColors[i]} style={cellStyles[i]} />
           ))}
         </Pie>
         <Legend
-          align={legendLayout ? "right" : "center"}
+          content={CustomLegend}
           wrapperStyle={legendLayout ? legendStyle : undefined}
-          payload={dataToMap?.map((_, i) => ({
-            color: cellColors[i],
-            value: _[date],
-          }))}
           layout={legendLayout ? "vertical" : "horizontal"}
+          align={legendLayout ? "right" : "center"}
           verticalAlign={legendLayout ? "middle" : "bottom"}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-        ></Legend>
+          payload={legendPayload}
+        />
         <Tooltip
           itemStyle={{ color: "inherit" }}
           contentStyle={{

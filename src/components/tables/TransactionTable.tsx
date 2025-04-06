@@ -133,7 +133,7 @@ const TransactionTable = () => {
       const response = await fetch(url.href);
       return await response.json();
     },
-    keepPreviousData: true,
+    staleTime: Infinity,
   });
 
   const columns = useMemo<MRT_ColumnDef<Transaction>[]>(
@@ -164,7 +164,7 @@ const TransactionTable = () => {
   );
 
   const handleExportRows = (rows: MRT_Row<Transaction>[]) => {
-    const rowData = rows.map((row) => row.original);
+    const rowData: any = rows.map((row) => row.original);
     const csv = generateCsv(csvConfig)(rowData);
     download(csvConfig)(csv);
   };
@@ -256,10 +256,9 @@ const TransactionTable = () => {
                 </Tooltip>
               </Box>
             )}
-            editingMode="row"
+            enableEditing
             enableColumnResizing
             enableFilterMatchHighlighting
-            enableEditing
             columns={columns}
             data={data ?? []}
             initialState={{ showColumnFilters: true }}

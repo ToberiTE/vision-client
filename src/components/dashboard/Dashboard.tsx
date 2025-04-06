@@ -16,7 +16,7 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { FC, memo, useEffect, useState } from "react";
 import { useMsal } from "@azure/msal-react";
 import SettingsIcon from "@mui/icons-material/Settings";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
@@ -99,8 +99,7 @@ import {
   setPieChartToolbarVisible,
   setPieChartSorting,
 } from "../../reducers/_pieChartSlice";
-import { AnyAction, Dispatch } from "@reduxjs/toolkit";
-import React from "react";
+import { Action, Dispatch } from "@reduxjs/toolkit";
 import {
   SortDescIcon,
   SortAscIcon,
@@ -122,12 +121,12 @@ import {
   selectScatterChartFields,
 } from "../../reducers/selectors";
 
-const Dashboard: React.FC = React.memo(() => {
+const Dashboard: FC = memo(() => {
   //#region hooks
   const theme = useTheme();
   const xlScreen = useMediaQuery(theme.breakpoints.up(2000));
   const lgScreen = useMediaQuery(theme.breakpoints.up(1550));
-  const dispatch = useDispatch<Dispatch<AnyAction>>();
+  const dispatch = useDispatch<Dispatch<Action>>();
   const { accounts } = useMsal();
   const name = accounts[0]?.idTokenClaims?.name;
   const [selectedListItems, setSelectedListItems] = useState<string[]>([]);
