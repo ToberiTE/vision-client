@@ -33,7 +33,7 @@ jobs:
         run: tar cvzf dist.tar.gz --exclude=node_modules dist
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build
           path: dist.tar.gz
