@@ -26,8 +26,8 @@ jobs:
       - name: Build app
         run: |
           NODE_OPTIONS='--max_old_space_size=4096' 
-          npm install
-          npm run build
+          npm install --force
+          npm run build --force
 
       - name: Archive production build
         run: tar cvzf dist.tar.gz --exclude=node_modules dist
